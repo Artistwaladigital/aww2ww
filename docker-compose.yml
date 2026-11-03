@@ -1,0 +1,18 @@
+services:
+  aww2ww:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aww2ww:latest
+    container_name: aww2ww_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    volumes:
+      - aww2ww_data:/app/database
+
+volumes:
+  aww2ww_data:

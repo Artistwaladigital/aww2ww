@@ -1,96 +1,98 @@
-# aww2ww ♥ — Social Media Platform
+# aww2ww - Real People, Real Vibes ✨
 
-> **Real People • Real Vibes**  
-> A modern hybrid social network combining the community feed, groups, and discussions of **Facebook** with the creator aesthetics, stories, reels, and direct notes of **Instagram**.
+A modern, high-performance hybrid social media application combining the best elements of **Facebook** and **Instagram**.
 
----
-
-## 🌟 Key Features
-
-- **Hybrid Community Feed**: Stories carousel, *"What's on your mind? ✨"* post creator, mosaic collage post layouts (1/6 indicator, 5.2K views badge, Reel preview), and interactive Facebook-style reaction picker (👍 Like, ❤️ Love, 🥰 Care, 😆 Haha, 😮 Wow, 😢 Sad, 😡 Angry) with celebration confetti.
-- **Messenger & Direct Chat**: Direct 1-on-1 chatting with Ananya Saha, real-time message exchange, photo attachments, auto-replies simulation, audio/video call modal, and Instagram-style thought **Notes**.
-- **Reels & Video Experience**: Trending explore grid with category filters (*For You*, *Trending*, *Music*, *Dance*, *Travel*), featured hero banner, and vertical fullscreen player with creator follow, likes, comments drawer, virtual gift 🎁, and music drawer (*Bengali, Hindi, English, Lofi*).
-- **Creator Profile & Highlights**: Banner with glowing neon crown (*Create Inspire Shine ✨*), verified badge ✓, stats (245 Posts | 2.4M Followers | 386 Following), story highlights circles, 3x3 post grid with pinned badges, and profile actions bottom sheet.
-- **Dual Display Modes**: Seamlessly toggle between:
-  - 💻 **Desktop Web Layout**: 3-column Facebook + Instagram hybrid website with left sidebar, center feed, and right active contacts panel.
-  - 📱 **Mobile Phone Layout**: Authentic iPhone 16 Pro mockup frame with status bar and dynamic island matching design mockups.
-- **Authentication**: Modern Login and Sign Up screens with diverse illustration, terms checkbox, and social authentication options.
-- **Trilingual Support**: English, বাংলা (Bengali), and Banglish.
-- **SQLite Database & REST API**: 10 diverse pre-seeded creator profiles, posts, reels, stories, comments, and messages.
+Developed for **aww2ww**, featuring a mobile-first responsive layout (iPhone 16 Pro mockup mode) and a 3-column Facebook/Instagram Web mode for desktop screens, backed by a persistent SQLite database and an Express REST API.
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Key Features
 
-### 1. Prerequisites
-- Node.js (v18+ recommended)
-- npm
+### 1. Home Feed (Facebook + Instagram Fusion)
+- **Top Bar**: Custom branded logo with gradient heart, global search, direct messenger badge, notifications badge, and current active profile avatar.
+- **Stories Carousel**: Horizontal story bar with gradient active rings, "Create Story" button, and unread story status.
+- **Interactive Post Composer**: "What's on your mind?", Live video button, Photo upload, Reel shortcut, and Feeling/activity picker.
+- **Mosaic Image Grid**: Multi-photo collage layouts (1-6 images), pinned posts, verified creator badges, timestamp, and captions.
+- **Facebook Emoji Reactions**: Like 👍, Love ❤️, Care 🥰, Haha 😂, Wow 😮, Sad 😢, Angry 😡 with real-time reaction counts.
+- **Comment Section & Quick Actions**: Like, comment modal, send via DM, share to feed or external apps.
 
-### 2. Install Dependencies
-```bash
-npm install
-```
+### 2. Messenger & Direct Messages
+- **Instagram-style Direct Notes**: Share notes and emoji status above inbox chats.
+- **Inbox Filter Tabs**: All, Unread, Groups, Requests with unread message counter badges.
+- **Active Chat Screen**: Real-time 1-on-1 chat interface with photo attachments, audio notes, emojis, and status ticks.
+- **New Message Modal**: Quick friend selection with multi-select and "Create Group" options.
 
-### 3. Initialize & Seed Database
-```bash
-npm run seed
-```
+### 3. Creator Profiles & Highlights
+- **Cover Photo & Neon Header**: Creator profile banner, neon signs, and verified badges.
+- **Stats Counter**: Posts, Followers, and Following counts.
+- **Story Highlights**: Categorized circles (Travel, OOTD, BTS, Food, Me).
+- **Tabbed Content**: Posts Grid, Reels Grid, and Tagged photos.
+- **Profile Action Sheet**: Share profile, Copy link, Add to close friends, Block, Report.
 
-### 4. Start SQLite REST API Backend (Port 5000)
-```bash
-npm run server
-```
+### 4. Reels & Watch Feed
+- **Reels Explore Grid**: Dynamic trending video cards with view counts and creator labels.
+- **Fullscreen Reels Player**: Auto-looping video player, Like, Comment, Share, Audio track drawer, and gift animations.
+- **Reel Comments Drawer**: Community discussions with reply threads and heart reactions.
+- **Audio Selector Modal**: Trending Bengali, Hindi, and English music tracks.
 
-### 5. Start Vite Frontend (Port 5173)
-```bash
-npm run dev
-```
-
-Visit **[http://localhost:5173/](http://localhost:5173/)** in your browser.
-
----
-
-## 🌐 Hostinger Deployment Guide
-
-### Option 1: Hostinger Git Deployment (via hPanel)
-1. Push this repository to your GitHub account.
-2. Log in to **Hostinger hPanel**.
-3. Under **Domains / Subdomains**, create your desired subdomain (e.g., `aww.yourdomain.com`).
-4. Go to **Advanced > Git** in hPanel.
-5. Create a new repository:
-   - **Repository URL**: `https://github.com/<your-username>/aww2ww.git`
-   - **Branch**: `main`
-   - **Install directory**: `public_html/<your-subdomain-folder>`
-6. Click **Deploy**.
-
-### Option 2: Production Static Web Deployment (Frontend Only)
-1. Run `npm run build` to generate the production bundle in `dist/`.
-2. In Hostinger hPanel > **File Manager**, navigate to your subdomain's folder.
-3. Upload all files from the `dist/` folder into your subdomain root.
-4. Add an `.htaccess` file for Single Page Application (SPA) routing:
-```apache
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
-</IfModule>
-```
-
-### Option 3: Hostinger VPS / Node.js Application (Full-Stack)
-1. In Hostinger hPanel > **Node.js** (or VPS):
-2. Select Node.js version 18+ or 20+.
-3. Set **Application root** to your project folder.
-4. Set **Application startup file** to `server.js`.
-5. Run `npm install`, `npm run seed`, and start the app with PM2.
+### 5. Multi-Device Experience
+- **Mobile Mode**: Pixel-perfect iPhone 16 Pro mockup frame with dynamic island and rounded bezel.
+- **Desktop Web Mode**: 3-column social network layout (Left navigation & quick profile switcher, Center feed, Right contacts & sponsored sidebar).
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4, Lucide Icons, Canvas-Confetti
-- **Backend API**: Node.js, Express, CORS
-- **Database**: SQLite (`better-sqlite3`)
-- **License**: MIT
+- **Backend**: Node.js, Express.js
+- **Database**: SQLite (via `better-sqlite3` with WAL mode enabled)
+- **Deployment**: Docker, Docker Compose, Coolify, Traefik
+
+---
+
+## 📦 Local Development
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Artistwaladigital/aww2ww.git
+   cd aww2ww
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Seed SQLite database with 10 demo profiles & posts**:
+   ```bash
+   npm run seed
+   ```
+
+4. **Start backend API server (Port 5000)**:
+   ```bash
+   npm run server
+   ```
+
+5. **Start frontend dev server (Port 5173)**:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🐳 Docker & Coolify Deployment
+
+This repository includes a ready-to-run `Dockerfile` and `docker-compose.yml`.
+
+### Running with Docker Compose:
+```bash
+docker compose up -d --build
+```
+The application will be live at `http://localhost:5000`.
+
+### Coolify Setup:
+1. In Coolify, create a new **Application** from Public or Private GitHub Repository: `https://github.com/Artistwaladigital/aww2ww`.
+2. Set Build Pack to **Dockerfile** (or **Docker Compose**).
+3. Set Port to **5000**.
+4. Set your custom subdomain (e.g., `https://aww2ww.alikecreator.com`).
+5. Click **Deploy**.

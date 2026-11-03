@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "node server.js",
     "server": "node server.js",
     "seed": "node database/seed.js",
     "build": "tsc -b && vite build",
