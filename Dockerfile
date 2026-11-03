@@ -1,6 +1,10 @@
-FROM node:20
+FROM node:20-bookworm-slim
 
 WORKDIR /app
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ gcc && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm install
