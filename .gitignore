@@ -12,8 +12,10 @@ dist
 dist-ssr
 *.local
 *.zip
-database/*.sqlite-wal
-database/*.sqlite-shm
+database/*.sqlite*
+*.mjs
+*.png
+*.txt
 
 # Editor directories and files
 .vscode/*

@@ -584,4 +584,8 @@ export function seedDatabase() {
   console.log('Database seeded with rich demo profiles, posts, reels, comments, and messages successfully!');
 }
 
-seedDatabase();
+if (process.argv[1] && process.argv[1].endsWith('seed.js')) {
+  seedDatabase();
+}
+
+export default seedDatabase;

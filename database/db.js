@@ -1,15 +1,24 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+if (!fs.existsSync(__dirname)) {
+  fs.mkdirSync(__dirname, { recursive: true });
+}
+
 const dbPath = path.join(__dirname, 'aww2ww.sqlite');
 const db = new Database(dbPath);
 
-// Enable WAL mode for high performance
-db.pragma('journal_mode = WAL');
+try {
+  // Enable WAL mode for high performance
+  db.pragma('journal_mode = WAL');
+} catch (e) {
+  console.warn('Pragma WAL warning:', e.message);
+}
 
 export function initDatabase() {
   db.exec(`

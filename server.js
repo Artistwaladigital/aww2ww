@@ -4,6 +4,14 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import db, { initDatabase } from './database/db.js';
+import { seedDatabase } from './database/seed.js';
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +24,7 @@ try {
   const row = db.prepare('SELECT COUNT(*) as count FROM users').get();
   if (!row || row.count === 0) {
     console.log('Database empty. Running seed...');
-    import('./database/seed.js');
+    seedDatabase();
   }
 } catch (e) {
   console.warn('Seed check warning:', e.message);
@@ -416,11 +424,11 @@ app.get('/api/groups', (req, res) => {
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(distPath, 'index.html'));
     }
-    res.sendFile(path.join(distPath, 'index.html'));
+    next();
   });
 }
 
