@@ -42,7 +42,7 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({ children }) => {
             <span className="text-pink-500 text-lg font-bold">♥</span>
           </div>
           <span className="hidden sm:inline-block text-gray-500 font-serif italic border-l border-purple-200 pl-2.5">
-            Facebook & Instagram Combined Platform
+            Real People • Real Vibes
           </span>
         </div>
 

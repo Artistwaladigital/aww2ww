@@ -238,7 +238,7 @@ export const MenuView: React.FC = () => {
             <span className="text-pink-500">♥</span>
             <span>Version 2.0</span>
           </div>
-          <p>Facebook & Instagram Hybrid Social Network</p>
+          <p>Connect • Share • Inspire</p>
           <p className="text-[10px] text-gray-400">Real People • Real Vibes • Kolkata & World</p>
         </div>
       </div>
