@@ -112,7 +112,12 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>('mobile');
+  const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024 ? 'desktop' : 'mobile';
+    }
+    return 'desktop';
+  });
   const [language, setLanguage] = useState<Language>('en');
 
   const [currentUser] = useState<User>(CURRENT_USER);
@@ -146,6 +151,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const isDesktop = window.innerWidth >= 1024;
+      setViewMode(isDesktop ? 'desktop' : 'mobile');
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   React.useEffect(() => {
     // Load initial data from SQLite Database

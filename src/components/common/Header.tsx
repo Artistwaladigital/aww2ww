@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Search, Bell, MessageCircle, X } from 'lucide-react';
+import { Search, Bell, MessageCircle, X, Monitor } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { setActiveTab, currentUser, showToast } = useApp();
+  const { setActiveTab, setViewMode, currentUser, showToast } = useApp();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
@@ -62,6 +62,18 @@ export const Header: React.FC = () => {
             <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white shadow-xs">
               12
             </span>
+          </button>
+
+          {/* Switch to Web / Desktop View on tablet or PC */}
+          <button
+            onClick={() => {
+              setViewMode('desktop');
+              showToast('Switched to Web Desktop View 💻');
+            }}
+            className="hidden sm:flex w-9 h-9 rounded-full bg-purple-50/80 hover:bg-purple-100 text-purple-700 items-center justify-center transition-colors active:scale-95"
+            title="Switch to Web Desktop View"
+          >
+            <Monitor className="w-4 h-4" />
           </button>
 
           {/* User Profile Avatar */}

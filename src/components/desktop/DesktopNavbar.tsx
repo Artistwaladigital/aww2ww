@@ -154,17 +154,17 @@ export const DesktopNavbar: React.FC = () => {
           <Sparkles className="w-4 h-4" />
         </button>
 
-        {/* Switch to Phone Mockup Frame */}
+        {/* Switch to Mobile View */}
         <button
           onClick={() => {
             setViewMode('mobile');
-            showToast('Switched to iPhone 16 Pro mockup frame 📱');
+            showToast('Switched to Mobile View 📱');
           }}
           className="flex items-center space-x-1 bg-purple-100/70 hover:bg-purple-200/70 text-purple-700 font-bold text-xs px-3 py-1.5 rounded-full transition-colors"
-          title="Switch to Mobile Phone View"
+          title="Switch to Mobile View"
         >
           <Smartphone className="w-3.5 h-3.5" />
-          <span className="hidden xl:inline">Mobile Frame</span>
+          <span className="hidden xl:inline">Mobile View</span>
         </button>
 
         {/* Language selector */}
