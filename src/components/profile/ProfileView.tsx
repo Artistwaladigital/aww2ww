@@ -14,6 +14,7 @@ import {
   Camera
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { API_URL } from '../../api/client';
 import { PROFILE_POSTS_GRID, MOCK_HIGHLIGHTS } from '../../data/mockData';
 
 export const ProfileView: React.FC = () => {
@@ -46,7 +47,7 @@ export const ProfileView: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/upload', {
+      const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
       });

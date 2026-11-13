@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Camera, Plus, Eye, EyeOff } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { API_URL } from '../../api/client';
 
 export const RegisterScreen: React.FC = () => {
   const { setAuthScreen, register, login, setActiveTab, showToast, t } = useApp();
@@ -24,7 +25,7 @@ export const RegisterScreen: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch('/api/upload', {
+      const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
       });

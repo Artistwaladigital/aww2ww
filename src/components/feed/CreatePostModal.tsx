@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Image, Smile, Globe, ChevronDown, Check, Upload, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { API_URL } from '../../api/client';
 
 export const CreatePostModal: React.FC = () => {
   const { isCreatePostOpen, setIsCreatePostOpen, currentUser, addPost, showToast } = useApp();
@@ -34,7 +35,7 @@ export const CreatePostModal: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/upload', {
+      const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData,
       });

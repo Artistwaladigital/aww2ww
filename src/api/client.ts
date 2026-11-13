@@ -1,4 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const isNativeApp = typeof window !== 'undefined' && (
+  window.location.protocol === 'capacitor:' || 
+  (window.location.hostname === 'localhost' && window.location.port !== '5173')
+);
+
+export const API_BASE_URL = import.meta.env.VITE_API_URL || (isNativeApp ? 'http://201.18.203.238' : '');
+export const API_URL = API_BASE_URL ? `${API_BASE_URL}/api` : '/api';
 
 export const apiClient = {
   async getPosts() {
