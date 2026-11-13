@@ -9,14 +9,20 @@ else
   echo "Release keystore already exists."
 fi
 
-echo "=== 2. Installing Android SDK 36 Platform & Accepting Licenses ==="
+echo "=== 2. Exporting Public Certificate for Google Play Console ==="
+keytool -export -rfc -keystore /workspace/android/app/release.keystore -alias aww2ww -storepass aww2ww123 -file /workspace/android/app/aww2ww_certificate.pem -noprompt || true
+keytool -export -keystore /workspace/android/app/release.keystore -alias aww2ww -storepass aww2ww123 -file /workspace/android/app/aww2ww_cert.der -noprompt || true
+
+echo "=== 3. Installing Android SDK 36 Platform & Accepting Licenses ==="
 yes | sdkmanager --licenses > /dev/null 2>&1 || true
 sdkmanager "platforms;android-36" > /dev/null 2>&1 || true
 
-echo "=== 3. Building Release Android App Bundle (.AAB) ==="
+echo "=== 4. Building Release Android App Bundle (.AAB) and Release APK (.APK) ==="
 chmod +x /workspace/android/gradlew
 cd /workspace/android
-./gradlew bundleRelease --no-daemon
+./gradlew bundleRelease assembleRelease --no-daemon
 
-echo "=== 4. Build Finished! ==="
+echo "=== 5. Build Finished! ==="
 ls -lh /workspace/android/app/build/outputs/bundle/release/
+ls -lh /workspace/android/app/build/outputs/apk/release/
+ls -lh /workspace/android/app/aww2ww_certificate.pem
