@@ -6,11 +6,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (!fs.existsSync(__dirname)) {
-  fs.mkdirSync(__dirname, { recursive: true });
+const dbDir = process.env.DB_DIR || __dirname;
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const dbPath = path.join(__dirname, 'aww2ww.sqlite');
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'aww2ww.sqlite');
 const db = new Database(dbPath);
 
 try {
