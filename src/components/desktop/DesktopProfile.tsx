@@ -22,6 +22,9 @@ import { CreatePostBox } from '../feed/CreatePostBox';
 export const DesktopProfile: React.FC = () => {
   const { 
     profileUser, 
+    currentUser,
+    updateCurrentUser,
+    logout,
     setActiveTab, 
     openChat, 
     isFollowingCreator, 
@@ -35,6 +38,8 @@ export const DesktopProfile: React.FC = () => {
 
   const [activeTab, setActiveProfileTab] = useState<'posts' | 'reels' | 'tagged'>('posts');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const isMe = profileUser.id === currentUser.id;
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-4 pb-16 select-none">
@@ -105,28 +110,63 @@ export const DesktopProfile: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex items-center justify-center space-x-2.5">
-              <button
-                onClick={toggleFollowCreator}
-                className={`px-6 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 shadow-xs transition-all active:scale-95 ${
-                  isFollowingCreator
-                    ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                    : 'bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white hover:opacity-95'
-                }`}
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>{isFollowingCreator ? t.following : t.follow}</span>
-              </button>
+              {isMe ? (
+                <>
+                  <button
+                    onClick={() => {
+                      const newBio = prompt('Update your Bio:', profileUser.bio || '');
+                      if (newBio !== null) {
+                        updateCurrentUser({ bio: newBio });
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white hover:opacity-95 shadow-xs transition-all active:scale-95"
+                  >
+                    Edit Bio ✍️
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newName = prompt('Update your Display Name:', profileUser.name);
+                      if (newName && newName.trim()) {
+                        updateCurrentUser({ name: newName.trim() });
+                      }
+                    }}
+                    className="px-4 py-2.5 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+                  >
+                    Edit Name
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={toggleFollowCreator}
+                    className={`px-6 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 shadow-xs transition-all active:scale-95 ${
+                      isFollowingCreator
+                        ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        : 'bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white hover:opacity-95'
+                    }`}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>{isFollowingCreator ? t.following : t.follow}</span>
+                  </button>
 
-              <button
-                onClick={() => {
-                  openChat('chat_ananya');
-                  setActiveTab('messenger');
-                }}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 hover:bg-purple-100 flex items-center space-x-2 transition-colors active:scale-95"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{t.message}</span>
-              </button>
+                  <button
+                    onClick={() => {
+                      openChat(profileUser.id === 'user_ananya' ? 'chat_ananya' : `chat_${profileUser.id}`);
+                      setActiveTab('messenger');
+                    }}
+                    className="px-5 py-2.5 rounded-xl font-bold text-xs bg-purple-50 text-purple-700 hover:bg-purple-100 flex items-center space-x-2 transition-colors active:scale-95"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{t.message}</span>
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => showToast('Profile link copied to clipboard! 📋')}

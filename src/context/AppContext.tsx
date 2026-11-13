@@ -10,7 +10,6 @@ import type {
 } from '../types';
 import {
   CURRENT_USER,
-  ANANYA_SAHA,
   MOCK_POSTS,
   MOCK_STORIES,
   MOCK_CHATS,
@@ -37,6 +36,8 @@ interface AppContextType {
 
   // Current User & Profile
   currentUser: User;
+  setCurrentUser: (user: User) => void;
+  updateCurrentUser: (data: Partial<User>) => Promise<void>;
   profileUser: User;
   setProfileUser: (user: User) => void;
   isFollowingCreator: boolean;
@@ -100,7 +101,8 @@ interface AppContextType {
   authScreen: 'login' | 'signup';
   setAuthScreen: (screen: 'login' | 'signup') => void;
   isAuthenticated: boolean;
-  login: () => void;
+  login: (usernameOrEmail?: string, password?: string) => Promise<boolean>;
+  register: (userData: { name: string; username: string; email?: string; password?: string; avatar?: string }) => Promise<boolean>;
   logout: () => void;
 
   // Toast
@@ -120,8 +122,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [language, setLanguage] = useState<Language>('en');
 
-  const [currentUser] = useState<User>(CURRENT_USER);
-  const [profileUser, setProfileUser] = useState<User>(ANANYA_SAHA);
+  const [currentUser, setCurrentUser] = useState<User>(() => {
+    try {
+      const saved = localStorage.getItem('aww2ww_user');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse saved user:', e);
+    }
+    return CURRENT_USER;
+  });
+  const [profileUser, setProfileUser] = useState<User>(() => {
+    try {
+      const saved = localStorage.getItem('aww2ww_user');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return CURRENT_USER;
+  });
   const [isFollowingCreator, setIsFollowingCreator] = useState<boolean>(false);
 
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
@@ -391,7 +407,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     // Auto-reply simulation from Ananya after 1.5s
-    if (chatId === 'chat_ananya') {
+    if (chatId === 'chat_ananya' || chatId.includes('ananya')) {
       setTimeout(() => {
         const replies = [
           "That sounds wonderful! Can't wait 💜✨",
@@ -409,9 +425,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           status: 'read' as const,
         };
 
+        apiClient.sendMessage(chatId, 'user_ananya', randomReply);
+
         setChats(prevChats =>
           prevChats.map(c => {
-            if (c.id !== 'chat_ananya') return c;
+            if (c.id !== chatId) return c;
             return {
               ...c,
               lastMessage: randomReply,
@@ -461,13 +479,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActivePostComments(null);
   };
 
-  const login = () => {
-    setIsAuthenticated(true);
-    setActiveTab('home');
-    showToast('Logged in successfully! Welcome to aww2ww ✨');
+  const updateCurrentUser = async (data: Partial<User>) => {
+    const updated = { ...currentUser, ...data };
+    setCurrentUser(updated);
+    if (profileUser.id === currentUser.id) {
+      setProfileUser(updated);
+    }
+    localStorage.setItem('aww2ww_user', JSON.stringify(updated));
+    await apiClient.updateProfile(currentUser.id, data);
+    showToast('Profile updated! ✨');
+  };
+
+  const login = async (usernameOrEmail?: string, password?: string): Promise<boolean> => {
+    if (!usernameOrEmail) {
+      localStorage.setItem('aww2ww_user', JSON.stringify(CURRENT_USER));
+      setCurrentUser(CURRENT_USER);
+      setProfileUser(CURRENT_USER);
+      setIsAuthenticated(true);
+      setActiveTab('home');
+      showToast('Logged in successfully! Welcome to aww2ww ✨');
+      return true;
+    }
+
+    const res = await apiClient.login(usernameOrEmail, password);
+    if (res && res.success && res.user) {
+      setCurrentUser(res.user);
+      setProfileUser(res.user);
+      localStorage.setItem('aww2ww_user', JSON.stringify(res.user));
+      setIsAuthenticated(true);
+      setActiveTab('home');
+      showToast(`Welcome back, ${res.user.name}! ✨`);
+      return true;
+    } else {
+      showToast(res?.error || 'Login failed. Please check credentials.');
+      return false;
+    }
+  };
+
+  const register = async (userData: { name: string; username: string; email?: string; password?: string; avatar?: string }): Promise<boolean> => {
+    const res = await apiClient.register(userData);
+    if (res && res.success && res.user) {
+      setCurrentUser(res.user);
+      setProfileUser(res.user);
+      localStorage.setItem('aww2ww_user', JSON.stringify(res.user));
+      setIsAuthenticated(true);
+      setActiveTab('home');
+      showToast(`Account created! Welcome to aww2ww, ${res.user.name} 🎉`);
+      return true;
+    } else {
+      showToast(res?.error || 'Registration failed.');
+      return false;
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem('aww2ww_user');
     setIsAuthenticated(false);
     setActiveTab('auth');
     setAuthScreen('login');
@@ -485,6 +551,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLanguage,
         t,
         currentUser,
+        setCurrentUser,
+        updateCurrentUser,
         profileUser,
         setProfileUser,
         isFollowingCreator,
@@ -535,6 +603,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAuthScreen,
         isAuthenticated,
         login,
+        register,
         logout,
         toastMessage,
         showToast,

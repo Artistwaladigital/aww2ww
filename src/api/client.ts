@@ -102,4 +102,56 @@ export const apiClient = {
       return null;
     }
   },
+
+  async register(data: { name: string; username: string; email?: string; password?: string; avatar?: string; bio?: string }) {
+    try {
+      const res = await fetch(`${API_URL}/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to connect to server' };
+    }
+  },
+
+  async login(usernameOrEmail: string, password?: string) {
+    try {
+      const res = await fetch(`${API_URL}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernameOrEmail, password }),
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to connect to server' };
+    }
+  },
+
+  async updateProfile(userId: string, data: any) {
+    try {
+      const res = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to update profile' };
+    }
+  },
+
+  async createChat(participantId: string, isGroup?: boolean, groupName?: string) {
+    try {
+      const res = await fetch(`${API_URL}/chats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participantId, isGroup, groupName }),
+      });
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
 };

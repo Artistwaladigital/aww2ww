@@ -3,7 +3,7 @@ import { Search, Bell, MessageCircle, X, Monitor } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { setActiveTab, setViewMode, currentUser, showToast } = useApp();
+  const { setActiveTab, setViewMode, currentUser, setProfileUser, showToast } = useApp();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
@@ -78,7 +78,10 @@ export const Header: React.FC = () => {
 
           {/* User Profile Avatar */}
           <button
-            onClick={() => setActiveTab('profile')}
+            onClick={() => {
+              setProfileUser(currentUser);
+              setActiveTab('profile');
+            }}
             aria-label="Profile"
             className="relative ml-0.5 group active:scale-95 transition-transform"
           >

@@ -22,6 +22,7 @@ export const DesktopNavbar: React.FC = () => {
     activeTab, 
     setActiveTab, 
     currentUser, 
+    setProfileUser,
     setViewMode, 
     language, 
     setLanguage, 
@@ -180,7 +181,10 @@ export const DesktopNavbar: React.FC = () => {
 
         {/* Current User Avatar pill */}
         <div
-          onClick={() => setActiveTab('profile')}
+          onClick={() => {
+            setProfileUser(currentUser);
+            setActiveTab('profile');
+          }}
           className="flex items-center space-x-2 pl-1 cursor-pointer group"
         >
           <img

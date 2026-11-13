@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import type { TabType } from '../../context/AppContext';
-import { CURRENT_USER, ANANYA_SAHA, MOCK_USERS } from '../../data/mockData';
+import { ANANYA_SAHA, MOCK_USERS } from '../../data/mockData';
 
 export const DesktopSidebar: React.FC = () => {
   const { 
@@ -36,9 +36,9 @@ export const DesktopSidebar: React.FC = () => {
 
   const demoProfiles = [
     {
-      user: CURRENT_USER,
-      title: 'Tania Roy (You)',
-      subtitle: 'Fashion & Lifestyle • 142K',
+      user: currentUser,
+      title: `${currentUser.name} (You)`,
+      subtitle: `${currentUser.category || 'Creator'} • ${currentUser.followers || '0'} Followers`,
       badge: 'You',
     },
     {

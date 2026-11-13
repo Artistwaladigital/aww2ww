@@ -154,11 +154,34 @@ app.use('/api/media', async (req, res) => {
   }
 });
 
+// Helper to format SQLite user row into camelCase User object
+function formatUser(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    username: row.username,
+    email: row.email || '',
+    avatar: row.avatar,
+    coverImage: row.cover_image,
+    bio: row.bio,
+    category: row.category,
+    location: row.location,
+    verified: Boolean(row.verified),
+    followers: row.followers || '0',
+    following: row.following || '0',
+    postsCount: row.posts_count || 0,
+    joinedDate: row.joined_date || 'Joined recently',
+    online: Boolean(row.online),
+    hasStory: Boolean(row.has_story),
+  };
+}
+
 // 1. Users
 app.get('/api/users', (req, res) => {
   try {
     const users = db.prepare('SELECT * FROM users').all();
-    res.json(users);
+    res.json(users.map(formatUser));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -168,7 +191,133 @@ app.get('/api/users/:id', (req, res) => {
   try {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
+    res.json(formatUser(user));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Register new user into SQLite database
+app.post('/api/users/register', (req, res) => {
+  try {
+    const { name, username, email, password, avatar, bio, location } = req.body;
+    if (!name || !username) {
+      return res.status(400).json({ error: 'Name and username are required' });
+    }
+
+    const cleanUsername = username.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const cleanEmail = email ? email.toLowerCase().trim() : null;
+
+    // Check if user already exists
+    const existing = db.prepare("SELECT * FROM users WHERE username = ? OR (email IS NOT NULL AND email != '' AND email = ?)").get(cleanUsername, cleanEmail || '');
+    if (existing) {
+      return res.status(400).json({ error: 'Username or email already exists. Please choose another or login.' });
+    }
+
+    const userId = `user_${Date.now()}`;
+    const defaultAvatar = avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+    const defaultCover = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80';
+    const joinedDate = 'Joined ' + new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
+
+    db.prepare(`
+      INSERT INTO users (id, name, username, email, password, avatar, cover_image, bio, category, location, verified, followers, following, posts_count, joined_date, online, has_story)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      userId,
+      name.trim(),
+      cleanUsername,
+      cleanEmail || '',
+      password || '',
+      defaultAvatar,
+      defaultCover,
+      bio || 'Living life on aww2ww ✨ Real People • Real Vibes',
+      'Creator',
+      location || 'Kolkata, India',
+      0,
+      '0',
+      '0',
+      0,
+      joinedDate,
+      1,
+      0
+    );
+
+    const newUser = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+
+    // Create a welcome chat thread with Ananya Saha
+    try {
+      const chatId = `chat_${userId}_ananya`;
+      db.prepare(`
+        INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+        VALUES (?, ?, 0, null, null, ?, ?)
+      `).run(chatId, 'user_ananya', 'Welcome to aww2ww! 💜 Say hi!', 'Just now');
+
+      db.prepare(`
+        INSERT INTO messages (id, chat_id, sender_id, text, media_url, media_type, status, created_at)
+        VALUES (?, ?, ?, ?, null, null, 'sent', ?)
+      `).run(`msg_welc_${Date.now()}`, chatId, 'user_ananya', `Welcome to aww2ww ${name.trim()}! 💜 Happy to connect with you!`, 'Just now');
+    } catch (chatErr) {
+      console.warn('Welcome chat warning:', chatErr.message);
+    }
+
+    res.status(201).json({ success: true, user: formatUser(newUser) });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Login endpoint
+app.post('/api/users/login', (req, res) => {
+  try {
+    const { usernameOrEmail } = req.body;
+    if (!usernameOrEmail) {
+      return res.status(400).json({ error: 'Username or email required' });
+    }
+
+    const cleanInput = usernameOrEmail.toLowerCase().trim();
+    let user = db.prepare('SELECT * FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?').get(cleanInput, cleanInput);
+
+    if (!user) {
+      if (cleanInput === 'taniaroy' || cleanInput.includes('tania')) {
+        user = db.prepare('SELECT * FROM users WHERE id = ?').get('user_tania');
+      }
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'Account not found. Please create a new account!' });
+    }
+
+    // Set online
+    db.prepare('UPDATE users SET online = 1 WHERE id = ?').run(user.id);
+    user.online = 1;
+
+    res.json({ success: true, user: formatUser(user) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update User Profile
+app.put('/api/users/:id', (req, res) => {
+  try {
+    const { name, bio, avatar, coverImage, location, category } = req.body;
+    const existing = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'User not found' });
+
+    db.prepare(`
+      UPDATE users SET 
+        name = COALESCE(?, name),
+        bio = COALESCE(?, bio),
+        avatar = COALESCE(?, avatar),
+        cover_image = COALESCE(?, cover_image),
+        location = COALESCE(?, location),
+        category = COALESCE(?, category)
+      WHERE id = ?
+    `).run(name, bio, avatar, coverImage, location, category, req.params.id);
+
+    const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+    res.json({ success: true, user: formatUser(updated) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -471,11 +620,64 @@ app.get('/api/chats', (req, res) => {
   }
 });
 
+// Create or Start Chat
+app.post('/api/chats', (req, res) => {
+  try {
+    const { participantId, isGroup, groupName } = req.body;
+    const chatId = `chat_${Date.now()}`;
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    db.prepare(`
+      INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      chatId,
+      participantId || null,
+      isGroup ? 1 : 0,
+      groupName || null,
+      isGroup ? '1 member' : null,
+      'Conversation started',
+      timeStr
+    );
+
+    let participant = null;
+    if (participantId) {
+      participant = formatUser(db.prepare('SELECT * FROM users WHERE id = ?').get(participantId));
+    }
+
+    res.status(201).json({
+      id: chatId,
+      isGroup: Boolean(isGroup),
+      groupName,
+      participant,
+      lastMessage: 'Conversation started',
+      timestamp: timeStr,
+      unreadCount: 0,
+      messages: []
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/chats/:id/messages', (req, res) => {
   try {
     const { senderId, text, mediaUrl } = req.body;
     const msgId = `msg_${Date.now()}`;
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Ensure chat thread exists in database
+    const existingChat = db.prepare('SELECT id FROM chats WHERE id = ?').get(req.params.id);
+    if (!existingChat) {
+      db.prepare(`
+        INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+        VALUES (?, ?, 0, null, null, ?, ?)
+      `).run(req.params.id, 'user_ananya', text || 'New message', timeStr);
+    }
+
+    // Ensure sender exists in DB so foreign key constraint passes
+    const sender = db.prepare('SELECT id FROM users WHERE id = ?').get(senderId || 'user_tania');
+    const validSenderId = sender ? sender.id : 'user_tania';
 
     db.prepare(`
       INSERT INTO messages (id, chat_id, sender_id, text, media_url, media_type, status, created_at)
@@ -483,7 +685,7 @@ app.post('/api/chats/:id/messages', (req, res) => {
     `).run(
       msgId,
       req.params.id,
-      senderId || 'user_tania',
+      validSenderId,
       text || '',
       mediaUrl || null,
       mediaUrl ? 'image' : null,
@@ -496,7 +698,7 @@ app.post('/api/chats/:id/messages', (req, res) => {
 
     res.status(201).json({
       id: msgId,
-      senderId: senderId || 'user_tania',
+      senderId: validSenderId,
       text,
       mediaUrl,
       mediaType: mediaUrl ? 'image' : undefined,

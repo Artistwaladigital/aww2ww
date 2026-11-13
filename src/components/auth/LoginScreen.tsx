@@ -5,14 +5,17 @@ import type { Language } from '../../data/translations';
 
 export const LoginScreen: React.FC = () => {
   const { setAuthScreen, login, setActiveTab, language, setLanguage, t } = useApp();
-  const [email, setEmail] = useState('taniaroy@aww2ww.com');
-  const [password, setPassword] = useState('••••••••');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login();
+    setIsSubmitting(true);
+    await login(email || 'taniaroy', password);
+    setIsSubmitting(false);
   };
 
   const languages: { id: Language; label: string }[] = [
@@ -153,9 +156,17 @@ export const LoginScreen: React.FC = () => {
           {/* Login Button matching Screenshot 2 gradient */}
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white font-bold text-xs shadow-md shadow-purple-600/25 hover:opacity-95 active:scale-98 transition-all"
+            disabled={isSubmitting}
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white font-bold text-xs shadow-md shadow-purple-600/25 hover:opacity-95 active:scale-98 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
           >
-            {t.login}
+            {isSubmitting ? (
+              <>
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Logging In...</span>
+              </>
+            ) : (
+              <span>{t.login}</span>
+            )}
           </button>
         </form>
 
@@ -170,7 +181,7 @@ export const LoginScreen: React.FC = () => {
         {/* Social Login Buttons matching Screenshot 2 (Google, Facebook, Apple) */}
         <div className="grid grid-cols-3 gap-2">
           <button
-            onClick={login}
+            onClick={() => login()}
             className="py-1.5 px-2 border border-purple-100 rounded-xl flex items-center justify-center space-x-1 hover:bg-purple-50/50 transition-colors"
           >
             <span className="text-xs font-bold text-amber-500">G</span>
@@ -178,7 +189,7 @@ export const LoginScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={login}
+            onClick={() => login()}
             className="py-1.5 px-2 border border-purple-100 rounded-xl flex items-center justify-center space-x-1 hover:bg-purple-50/50 transition-colors"
           >
             <span className="text-xs font-bold text-blue-600">f</span>
@@ -186,7 +197,7 @@ export const LoginScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={login}
+            onClick={() => login()}
             className="py-1.5 px-2 border border-purple-100 rounded-xl flex items-center justify-center space-x-1 hover:bg-purple-50/50 transition-colors"
           >
             <span className="text-xs font-bold text-gray-900"></span>

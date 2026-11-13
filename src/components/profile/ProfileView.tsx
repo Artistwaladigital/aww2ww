@@ -18,6 +18,9 @@ import { PROFILE_POSTS_GRID, MOCK_HIGHLIGHTS } from '../../data/mockData';
 export const ProfileView: React.FC = () => {
   const { 
     profileUser, 
+    currentUser,
+    updateCurrentUser,
+    logout,
     setActiveTab, 
     openChat, 
     isFollowingCreator, 
@@ -32,6 +35,7 @@ export const ProfileView: React.FC = () => {
   const [activeTab, setActiveProfileTab] = useState<'posts' | 'reels' | 'tagged'>('posts');
   const [selectedImageModal, setSelectedImageModal] = useState<string | null>(null);
 
+  const isMe = profileUser.id === currentUser.id;
   const isAnanya = profileUser.username === 'ananyasaha';
 
   return (
@@ -163,33 +167,68 @@ export const ProfileView: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Buttons: Follow, Message, Add */}
+        {/* Action Buttons: Follow, Message, Add or Edit */}
         <div className="flex items-center space-x-2 mt-3.5">
-          <button
-            onClick={toggleFollowCreator}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1 ${
-              isFollowingCreator
-                ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                : 'bg-gradient-to-r from-purple-700 to-pink-600 text-white hover:opacity-95'
-            }`}
-          >
-            <span>{isFollowingCreator ? '✓ Following' : '+ Follow'}</span>
-          </button>
+          {isMe ? (
+            <>
+              <button
+                onClick={() => {
+                  const newBio = prompt('Update your Bio:', profileUser.bio || '');
+                  if (newBio !== null) {
+                    updateCurrentUser({ bio: newBio });
+                  }
+                }}
+                className="flex-1 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-700 to-pink-600 text-white hover:opacity-95 shadow-xs transition-all flex items-center justify-center space-x-1"
+              >
+                <span>Edit Bio ✍️</span>
+              </button>
+              <button
+                onClick={() => {
+                  const newName = prompt('Update your Display Name:', profileUser.name);
+                  if (newName && newName.trim()) {
+                    updateCurrentUser({ name: newName.trim() });
+                  }
+                }}
+                className="flex-1 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-colors shadow-2xs flex items-center justify-center space-x-1.5"
+              >
+                <span>Edit Name</span>
+              </button>
+              <button
+                onClick={logout}
+                className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-colors shadow-2xs"
+              >
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={toggleFollowCreator}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center space-x-1 ${
+                  isFollowingCreator
+                    ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                    : 'bg-gradient-to-r from-purple-700 to-pink-600 text-white hover:opacity-95'
+                }`}
+              >
+                <span>{isFollowingCreator ? '✓ Following' : '+ Follow'}</span>
+              </button>
 
-          <button
-            onClick={() => openChat(isAnanya ? 'chat_ananya' : 'chat_mousumi')}
-            className="flex-1 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-colors shadow-2xs flex items-center justify-center space-x-1.5"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>Message</span>
-          </button>
+              <button
+                onClick={() => openChat(isAnanya ? 'chat_ananya' : `chat_${profileUser.id}`)}
+                className="flex-1 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-colors shadow-2xs flex items-center justify-center space-x-1.5"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Message</span>
+              </button>
 
-          <button
-            onClick={() => showToast('Friend recommendation sent')}
-            className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors shadow-2xs"
-          >
-            <UserPlus className="w-4 h-4" />
-          </button>
+              <button
+                onClick={() => showToast('Friend recommendation sent')}
+                className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors shadow-2xs"
+              >
+                <UserPlus className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Bio Details matching Screenshot 4 */}

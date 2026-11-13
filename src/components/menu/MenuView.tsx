@@ -222,7 +222,7 @@ export const MenuView: React.FC = () => {
             </button>
           ) : (
             <button
-              onClick={login}
+              onClick={() => login()}
               className="w-full py-2.5 rounded-xl bg-purple-700 text-white hover:bg-purple-800 font-bold text-xs flex items-center justify-center space-x-2 transition-colors shadow-xs"
             >
               <LogIn className="w-4 h-4" />
