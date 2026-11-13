@@ -9,10 +9,14 @@ else
   echo "Release keystore already exists."
 fi
 
-echo "=== 2. Building Release Android App Bundle (.AAB) ==="
+echo "=== 2. Installing Android SDK 36 Platform & Accepting Licenses ==="
+yes | sdkmanager --licenses > /dev/null 2>&1 || true
+sdkmanager "platforms;android-36" > /dev/null 2>&1 || true
+
+echo "=== 3. Building Release Android App Bundle (.AAB) ==="
 chmod +x /workspace/android/gradlew
 cd /workspace/android
 ./gradlew bundleRelease --no-daemon
 
-echo "=== 3. Build Finished! ==="
+echo "=== 4. Build Finished! ==="
 ls -lh /workspace/android/app/build/outputs/bundle/release/
