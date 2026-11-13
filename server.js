@@ -113,7 +113,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       }
       const localPath = path.join(localUploadDir, path.basename(key));
       fs.writeFileSync(localPath, file.buffer);
-      uploadedUrl = `/${folder}/${path.basename(key)}`;
+      uploadedUrl = `/api/media/${key}`;
     }
 
     res.json({
