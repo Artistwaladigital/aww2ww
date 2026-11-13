@@ -10,7 +10,8 @@ import {
   Bookmark, 
   Play, 
   Heart,
-  Crown
+  Crown,
+  Camera
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PROFILE_POSTS_GRID, MOCK_HIGHLIGHTS } from '../../data/mockData';
@@ -37,6 +38,29 @@ export const ProfileView: React.FC = () => {
 
   const isMe = profileUser.id === currentUser.id;
   const isAnanya = profileUser.username === 'ananyasaha';
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    showToast('Uploading profile photo... 📸');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        await updateCurrentUser({ avatar: data.url });
+        showToast('Profile photo updated! ✨');
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (err: any) {
+      showToast(`Upload failed: ${err.message || 'Try again'}`);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-white pb-24 select-none">
@@ -108,14 +132,26 @@ export const ProfileView: React.FC = () => {
       <div className="px-4 relative -mt-14 mb-3 text-left">
         <div className="flex items-end justify-between">
           {/* Avatar with colorful gradient ring & online badge */}
-          <div className="relative">
+          <div className="relative group">
             <div className="p-1 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 shadow-xl">
-              <div className="p-0.5 bg-white rounded-full">
+              <div className="p-0.5 bg-white rounded-full relative">
                 <img
                   src={profileUser.avatar}
                   alt={profileUser.name}
                   className="w-22 h-22 rounded-full object-cover"
                 />
+                {isMe && (
+                  <label className="absolute inset-0 bg-black/45 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                    <Camera className="w-5 h-5 mb-0.5" />
+                    <span className="text-[9px] font-bold">Change</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                    />
+                  </label>
+                )}
               </div>
             </div>
             {profileUser.online && (
@@ -193,6 +229,16 @@ export const ProfileView: React.FC = () => {
               >
                 <span>Edit Name</span>
               </button>
+              <label className="py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-colors shadow-2xs flex items-center justify-center space-x-1 cursor-pointer">
+                <Camera className="w-3.5 h-3.5" />
+                <span>Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+              </label>
               <button
                 onClick={logout}
                 className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-colors shadow-2xs"

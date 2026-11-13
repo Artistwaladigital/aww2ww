@@ -59,6 +59,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const uploadBaseDir = process.env.UPLOAD_DIR || path.join(__dirname, 'public');
+
 // Health check endpoint for Coolify / Docker
 app.get('/api/health', (req, res) => {
   res.json({
@@ -107,7 +109,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     } catch (r2Error) {
       console.warn('[R2 Warning] Cloudflare S3 upload attempt, saving local copy:', r2Error.message);
       storageEngine = 'local-fallback';
-      const localUploadDir = path.join(__dirname, 'public', folder);
+      const localUploadDir = path.join(uploadBaseDir, folder);
       if (!fs.existsSync(localUploadDir)) {
         fs.mkdirSync(localUploadDir, { recursive: true });
       }
@@ -146,9 +148,13 @@ app.use('/api/media', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     s3Res.Body.pipe(res);
   } catch (e) {
-    const localPath = path.join(__dirname, 'public', key);
+    const localPath = path.join(uploadBaseDir, key);
     if (fs.existsSync(localPath)) {
       return res.sendFile(localPath);
+    }
+    const publicPath = path.join(__dirname, 'public', key);
+    if (fs.existsSync(publicPath)) {
+      return res.sendFile(publicPath);
     }
     res.status(404).send('Media not found');
   }
