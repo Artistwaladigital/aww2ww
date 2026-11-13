@@ -1,0 +1,12 @@
+{
+	"appId": "com.aww2ww.app",
+	"appName": "aww2ww",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https",
+		"cleartext": true
+	},
+	"android": {
+		"allowMixedContent": true
+	}
+}
