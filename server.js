@@ -3,8 +3,31 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import db, { initDatabase } from './database/db.js';
 import { seedDatabase } from './database/seed.js';
+
+// Cloudflare R2 Credentials & S3 Client
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || '22dbb1c730cb29b1b2ca213f3cab0846';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '16a969d9aaaf9f3ca49b4f2d37c31a22';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || 'fa5b5b4c25831ccc3092f3283fd7afb9d3e5f9735942cd7c8737d5a959057245';
+const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'aww2ww-media';
+const R2_PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || '';
+
+const s3Client = new S3Client({
+  region: 'auto',
+  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: R2_ACCESS_KEY_ID,
+    secretAccessKey: R2_SECRET_ACCESS_KEY,
+  },
+});
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 150 * 1024 * 1024 }, // 150MB max per video/photo
+});
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);
@@ -43,8 +66,91 @@ app.get('/api/health', (req, res) => {
     app: 'aww2ww',
     version: '1.0.0',
     uptime: process.uptime(),
+    storage: {
+      r2Bucket: R2_BUCKET_NAME,
+      r2Configured: Boolean(R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY),
+    },
     timestamp: new Date().toISOString()
   });
+});
+
+// Cloudflare R2 Upload Endpoint for Videos & Photos
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const file = req.file;
+    const isVideo = file.mimetype.startsWith('video');
+    const ext = path.extname(file.originalname) || (isVideo ? '.mp4' : '.jpg');
+    const folder = isVideo ? 'videos' : 'photos';
+    const key = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
+
+    let uploadedUrl = '';
+    let storageEngine = 'cloudflare-r2';
+
+    try {
+      await s3Client.send(new PutObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }));
+
+      if (R2_PUBLIC_DOMAIN) {
+        uploadedUrl = `${R2_PUBLIC_DOMAIN.replace(/\/$/, '')}/${key}`;
+      } else {
+        uploadedUrl = `/api/media/${key}`;
+      }
+      console.log(`[R2] Uploaded ${key} successfully to Cloudflare R2!`);
+    } catch (r2Error) {
+      console.warn('[R2 Warning] Cloudflare S3 upload attempt, saving local copy:', r2Error.message);
+      storageEngine = 'local-fallback';
+      const localUploadDir = path.join(__dirname, 'public', folder);
+      if (!fs.existsSync(localUploadDir)) {
+        fs.mkdirSync(localUploadDir, { recursive: true });
+      }
+      const localPath = path.join(localUploadDir, path.basename(key));
+      fs.writeFileSync(localPath, file.buffer);
+      uploadedUrl = `/${folder}/${path.basename(key)}`;
+    }
+
+    res.json({
+      success: true,
+      url: uploadedUrl,
+      key,
+      type: isVideo ? 'video' : 'image',
+      storage: storageEngine,
+      size: file.size,
+      filename: file.originalname
+    });
+  } catch (err) {
+    console.error('Upload handler error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Stream Media from Cloudflare R2 or Local Fallback
+app.get('/api/media/*', async (req, res) => {
+  const key = req.params[0];
+  try {
+    const s3Res = await s3Client.send(new GetObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: key,
+    }));
+
+    if (s3Res.ContentType) res.setHeader('Content-Type', s3Res.ContentType);
+    if (s3Res.ContentLength) res.setHeader('Content-Length', s3Res.ContentLength);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    s3Res.Body.pipe(res);
+  } catch (e) {
+    const localPath = path.join(__dirname, 'public', key);
+    if (fs.existsSync(localPath)) {
+      return res.sendFile(localPath);
+    }
+    res.status(404).send('Media not found');
+  }
 });
 
 // 1. Users

@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { X, Image, Smile, Globe, ChevronDown, Check } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, Image, Smile, Globe, ChevronDown, Check, Upload, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const CreatePostModal: React.FC = () => {
-  const { isCreatePostOpen, setIsCreatePostOpen, currentUser, addPost } = useApp();
+  const { isCreatePostOpen, setIsCreatePostOpen, currentUser, addPost, showToast } = useApp();
   const [caption, setCaption] = useState('');
   const [selectedImage, setSelectedImage] = useState<string>(
     'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1000&q=80'
   );
   const [audience, setAudience] = useState<'Public' | 'Friends'>('Public');
   const [selectedFeeling, setSelectedFeeling] = useState<string>('✨ Happy & Blessed');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isCreatePostOpen) return null;
 
@@ -20,6 +22,37 @@ export const CreatePostModal: React.FC = () => {
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80',
   ];
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    showToast('Uploading to Cloudflare R2... ☁️');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        setSelectedImage(data.url);
+        showToast('Uploaded to Cloudflare R2! 🎉');
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (err: any) {
+      console.error('File upload error:', err);
+      showToast(`Upload error: ${err.message || 'Try again'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,14 +128,56 @@ export const CreatePostModal: React.FC = () => {
             ))}
           </div>
 
-          {/* Select Photo */}
+          {/* Device Upload Button */}
+          <div className="pt-1">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*,video/*"
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={isUploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-2.5 px-3 rounded-xl border-2 border-dashed border-purple-300 hover:border-purple-500 bg-purple-50/50 hover:bg-purple-50 text-purple-700 font-semibold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                  <span>Uploading to Cloudflare R2...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 text-purple-600" />
+                  <span>📁 Upload Photo or Video from Device</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Selected Media Preview */}
+          {selectedImage && (
+            <div className="relative rounded-xl overflow-hidden border border-purple-200 aspect-video max-h-48 bg-black flex items-center justify-center">
+              {selectedImage.includes('.mp4') || selectedImage.includes('video') ? (
+                <video src={selectedImage} controls className="w-full h-full object-contain" />
+              ) : (
+                <img src={selectedImage} alt="selected" className="w-full h-full object-cover" />
+              )}
+              <span className="absolute bottom-2 right-2 bg-black/70 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-md">
+                Attached Media
+              </span>
+            </div>
+          )}
+
+          {/* Preset Sample Photos */}
           <div>
             <label className="text-[11px] font-semibold text-gray-700 mb-1.5 flex items-center justify-between">
               <span className="flex items-center space-x-1">
                 <Image className="w-3.5 h-3.5 text-purple-600" />
-                <span>Attach Photo</span>
+                <span>Or select sample photo:</span>
               </span>
-              <span className="text-[10px] text-purple-500">Tap to select</span>
             </label>
             <div className="grid grid-cols-5 gap-1.5">
               {sampleImages.map((img, i) => (
@@ -129,7 +204,8 @@ export const CreatePostModal: React.FC = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/20 hover:opacity-95 active:scale-98 transition-all mt-2"
+            disabled={isUploading}
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 via-purple-600 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/20 hover:opacity-95 active:scale-98 disabled:opacity-50 transition-all mt-2"
           >
             Post to aww2ww ✨
           </button>

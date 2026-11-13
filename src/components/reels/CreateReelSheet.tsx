@@ -1,11 +1,45 @@
-import React from 'react';
-import { X, Camera, Image, LayoutTemplate, Sparkles } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { X, Camera, Image, LayoutTemplate, Sparkles, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const CreateReelSheet: React.FC = () => {
-  const { isCreateReelOpen, setIsCreateReelOpen, showToast } = useApp();
+  const { isCreateReelOpen, setIsCreateReelOpen, showToast, addPost } = useApp();
+  const [isUploading, setIsUploading] = useState(false);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   if (!isCreateReelOpen) return null;
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    showToast('Uploading Reel to Cloudflare R2... 🎬');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        addPost('New Reel Video ✨ #aww2ww #trending', data.url);
+        showToast('Reel uploaded and posted to Cloudflare R2! 🎉');
+        setIsCreateReelOpen(false);
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (err: any) {
+      console.error('Reel upload error:', err);
+      showToast(`Upload error: ${err.message || 'Try again'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const actions = [
     {
@@ -14,8 +48,7 @@ export const CreateReelSheet: React.FC = () => {
       icon: Camera,
       bg: 'bg-rose-100 text-rose-500',
       action: () => {
-        showToast('Camera opened! Recording reel...');
-        setIsCreateReelOpen(false);
+        videoInputRef.current?.click();
       },
     },
     {
@@ -24,8 +57,7 @@ export const CreateReelSheet: React.FC = () => {
       icon: Image,
       bg: 'bg-emerald-100 text-emerald-600',
       action: () => {
-        showToast('Choose video from gallery...');
-        setIsCreateReelOpen(false);
+        videoInputRef.current?.click();
       },
     },
     {
@@ -66,15 +98,31 @@ export const CreateReelSheet: React.FC = () => {
           </button>
         </div>
 
-        {/* 4 Quick Actions Row matching Screenshot 5 */}
+        <input
+          type="file"
+          ref={videoInputRef}
+          onChange={handleVideoUpload}
+          accept="video/*"
+          className="hidden"
+        />
+
+        {isUploading && (
+          <div className="w-full p-4 mb-3 bg-purple-50 rounded-2xl flex items-center justify-center space-x-2 text-xs font-bold text-purple-700">
+            <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+            <span>Uploading video to Cloudflare R2...</span>
+          </div>
+        )}
+
+        {/* 4 Quick Actions Row */}
         <div className="grid grid-cols-4 gap-3 w-full py-2">
           {actions.map(act => {
             const Icon = act.icon;
             return (
               <button
                 key={act.id}
+                disabled={isUploading}
                 onClick={act.action}
-                className="flex flex-col items-center space-y-2 group p-2 rounded-2xl hover:bg-gray-50 transition-colors"
+                className="flex flex-col items-center space-y-2 group p-2 rounded-2xl hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <div
                   className={`w-13 h-13 rounded-2xl ${act.bg} flex items-center justify-center shadow-xs group-hover:scale-105 active:scale-95 transition-transform`}
