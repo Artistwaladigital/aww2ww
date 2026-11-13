@@ -131,9 +131,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// Stream Media from Cloudflare R2 or Local Fallback
-app.get('/api/media/*', async (req, res) => {
-  const key = req.params[0];
+// Stream Media from Cloudflare R2 or Local Fallback (Express 5 compatible)
+app.use('/api/media', async (req, res) => {
+  const key = req.path.replace(/^\//, '');
+  if (!key) return res.status(400).send('Media key required');
   try {
     const s3Res = await s3Client.send(new GetObjectCommand({
       Bucket: R2_BUCKET_NAME,
