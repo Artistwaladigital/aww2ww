@@ -1,7 +1,31 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">aww2ww</string>
-    <string name="title_activity_main">aww2ww</string>
-    <string name="package_name">com.aww2ww.app</string>
-    <string name="custom_url_scheme">com.aww2ww.app</string>
+    <string name="tagline">Connect, Share &amp; Inspire</string>
+    <string name="tab_feed">Feed</string>
+    <string name="tab_reels">Reels</string>
+    <string name="tab_messages">Messages</string>
+    <string name="tab_profile">Profile</string>
+    <string name="create_post">Create Post</string>
+    <string name="post_hint">What\'s on your mind?</string>
+    <string name="publish">Publish</string>
+    <string name="cancel">Cancel</string>
+    <string name="login">Log In</string>
+    <string name="register">Sign Up</string>
+    <string name="logout">Log Out</string>
+    <string name="demo_login">Continue as Demo User</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email</string>
+    <string name="bio">Bio</string>
+    <string name="likes">Likes</string>
+    <string name="comments">Comments</string>
+    <string name="share">Share</string>
+    <string name="send">Send</string>
+    <string name="type_a_message">Type a message...</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="posts">Posts</string>
+    <string name="add_story">Your Story</string>
 </resources>
