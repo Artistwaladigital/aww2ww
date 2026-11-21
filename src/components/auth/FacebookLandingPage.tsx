@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, Film, MessageCircle, Sparkles, ShieldCheck, X, Camera, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Film, MessageCircle, Sparkles, Users, X, Camera, ArrowRight } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { API_URL } from '../../api/client';
 
@@ -147,12 +147,12 @@ export const FacebookLandingPage: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-3 p-3 bg-white rounded-2xl shadow-xs border border-purple-50">
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+                <Users className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <h4 className="text-xs font-bold text-gray-900">Safe &amp; Ad-Friendly</h4>
-                <p className="text-[11px] text-gray-500">AdSense &amp; brand ready creator platform</p>
+                <h4 className="text-xs font-bold text-gray-900">Connect &amp; Discover</h4>
+                <p className="text-[11px] text-gray-500">Meet friends, follow creators &amp; join communities</p>
               </div>
             </div>
           </div>
@@ -429,7 +429,7 @@ export const FacebookLandingPage: React.FC = () => {
             <span>Stories</span>
             <span>Community</span>
             <span>Creators</span>
-            <span>AdSense &amp; Advertising</span>
+            <span>Help Center</span>
             <span>Privacy</span>
             <span>Terms</span>
           </div>
