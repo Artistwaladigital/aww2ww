@@ -2,6 +2,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { DesktopLayout } from './components/desktop/DesktopLayout';
 import { MobileLayout } from './components/mobile/MobileLayout';
+import { FacebookLandingPage } from './components/auth/FacebookLandingPage';
 
 // Global Modals & Overlays
 import { StoryViewerModal } from './components/feed/StoryViewerModal';
@@ -16,7 +17,7 @@ import { ProfileOptionsSheet } from './components/profile/ProfileOptionsSheet';
 import { AboutModal } from './components/profile/AboutModal';
 
 const MainContent: React.FC = () => {
-  const { toastMessage, viewMode } = useApp();
+  const { toastMessage, viewMode, isAuthenticated } = useApp();
 
   return (
     <>
@@ -28,24 +29,31 @@ const MainContent: React.FC = () => {
         </div>
       )}
 
-      {/* Responsive View: Desktop Facebook/Instagram web layout for PC/Laptop, Mobile layout for phones */}
-      {viewMode === 'desktop' ? (
-        <DesktopLayout />
+      {/* If visitor is not logged in, display the Facebook-style Landing & Sign Up / Login Page */}
+      {!isAuthenticated ? (
+        <FacebookLandingPage />
       ) : (
-        <MobileLayout />
-      )}
+        <>
+          {/* Responsive Social Dashboard View: Desktop for PC/Laptop, Mobile layout for phones */}
+          {viewMode === 'desktop' ? (
+            <DesktopLayout />
+          ) : (
+            <MobileLayout />
+          )}
 
-      {/* Global Modals & Overlays (Available in both Desktop & Mobile) */}
-      <StoryViewerModal />
-      <FullscreenReelPlayer />
-      <ReelCommentsSheet />
-      <AddMusicSheet />
-      <CreateReelSheet />
-      <CreatePostModal />
-      <PostCommentsModal />
-      <NewChatModal />
-      <ProfileOptionsSheet />
-      <AboutModal />
+          {/* Global Modals & Overlays (Available in both Desktop & Mobile) */}
+          <StoryViewerModal />
+          <FullscreenReelPlayer />
+          <ReelCommentsSheet />
+          <AddMusicSheet />
+          <CreateReelSheet />
+          <CreatePostModal />
+          <PostCommentsModal />
+          <NewChatModal />
+          <ProfileOptionsSheet />
+          <AboutModal />
+        </>
+      )}
     </>
   );
 };

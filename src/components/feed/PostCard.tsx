@@ -131,16 +131,34 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
       {post.media && post.media.length > 0 && (
         <div className="w-full select-none">
           {post.media.length === 1 ? (
-            <div 
-              onClick={() => setSelectedPhoto(post.media[0].url)}
-              className="relative w-full aspect-square max-h-96 bg-gray-100 cursor-pointer overflow-hidden"
-            >
-              <img
-                src={post.media[0].url}
-                alt="Post media"
-                className="w-full h-full object-cover hover:scale-102 transition-transform duration-300"
-              />
-            </div>
+            (() => {
+              const m = post.media[0];
+              const isVideo = m.type === 'video' || m.type === 'reel' || m.url?.includes('/videos/') || m.url?.match(/\.(mp4|webm|mov|mkv)(\?.*)?$/i);
+              if (isVideo) {
+                return (
+                  <div className="relative w-full aspect-video max-h-96 bg-black rounded-lg overflow-hidden flex items-center justify-center">
+                    <video
+                      src={m.url}
+                      controls
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                );
+              }
+              return (
+                <div 
+                  onClick={() => setSelectedPhoto(m.url)}
+                  className="relative w-full aspect-square max-h-96 bg-gray-100 cursor-pointer overflow-hidden"
+                >
+                  <img
+                    src={m.url}
+                    alt="Post media"
+                    className="w-full h-full object-cover hover:scale-102 transition-transform duration-300"
+                  />
+                </div>
+              );
+            })()
           ) : post.media.length >= 4 ? (
             /* 4-Item Grid matching Tania Roy's post from Screenshot 1 */
             <div className="grid grid-cols-2 gap-1 px-1 bg-gray-50">

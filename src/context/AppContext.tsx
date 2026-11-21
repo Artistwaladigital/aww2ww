@@ -165,7 +165,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activePostComments, setActivePostComments] = useState<Post | null>(null);
 
   const [authScreen, setAuthScreen] = useState<'login' | 'signup'>('login');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return Boolean(localStorage.getItem('aww2ww_user'));
+    } catch {
+      return false;
+    }
+  });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -243,13 +249,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addPost = (caption: string, mediaUrl?: string) => {
+    const isVideo = mediaUrl && (mediaUrl.includes('/videos/') || mediaUrl.match(/\.(mp4|webm|mov|mkv)(\?.*)?$/i));
     const newPost: Post = {
       id: `post_${Date.now()}`,
       user: currentUser,
       timestamp: 'Just now',
       caption,
       media: mediaUrl
-        ? [{ type: 'image', url: mediaUrl }]
+        ? [{ type: isVideo ? 'video' : 'image', url: mediaUrl }]
         : [
             {
               type: 'image',

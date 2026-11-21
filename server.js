@@ -387,7 +387,8 @@ app.post('/api/posts', (req, res) => {
   try {
     const { userId, caption, mediaUrl } = req.body;
     const postId = `post_${Date.now()}`;
-    const media = mediaUrl ? [{ type: 'image', url: mediaUrl }] : [];
+    const isVideo = mediaUrl && (mediaUrl.includes('/videos/') || mediaUrl.match(/\.(mp4|webm|mov|mkv)(\?.*)?$/i));
+    const media = mediaUrl ? [{ type: isVideo ? 'video' : 'image', url: mediaUrl }] : [];
     const defaultReactions = {
       like: 1,
       love: 1,
@@ -547,6 +548,28 @@ app.get('/api/reels', (req, res) => {
       isLiked: Boolean(r.is_liked),
       category: r.category,
     })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/reels', (req, res) => {
+  try {
+    const { userId, videoUrl, caption, musicTitle } = req.body;
+    if (!videoUrl) return res.status(400).json({ error: 'Video URL is required' });
+    const reelId = `reel_${Date.now()}`;
+    db.prepare(`
+      INSERT INTO reels (id, user_id, video_url, thumbnail_url, caption, music_title, likes_count, comments_count, shares_count, views_count, is_liked, category)
+      VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, '1', 0, 'Trending')
+    `).run(
+      reelId,
+      userId || 'user_tania',
+      videoUrl,
+      videoUrl,
+      caption || 'New Reel on aww2ww ✨',
+      musicTitle || 'Trending Audio • aww2ww Original'
+    );
+    res.status(201).json({ success: true, reelId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -730,6 +753,28 @@ app.get('/api/groups', (req, res) => {
       description: g.description,
       isJoined: Boolean(g.joined),
     })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/reels', (req, res) => {
+  try {
+    const { userId, videoUrl, caption, musicTitle } = req.body;
+    if (!videoUrl) return res.status(400).json({ error: 'Video URL is required' });
+    const reelId = `reel_${Date.now()}`;
+    db.prepare(`
+      INSERT INTO reels (id, user_id, video_url, thumbnail_url, caption, music_title, likes_count, comments_count, shares_count, views_count, is_liked, category)
+      VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, '1', 0, 'Trending')
+    `).run(
+      reelId,
+      userId || 'user_tania',
+      videoUrl,
+      videoUrl,
+      caption || 'New Reel on aww2ww ✨',
+      musicTitle || 'Trending Audio • aww2ww Original'
+    );
+    res.status(201).json({ success: true, reelId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
