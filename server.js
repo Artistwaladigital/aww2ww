@@ -675,7 +675,7 @@ app.post('/api/friend-requests', (req, res) => {
     }
 
     // Check if pending request exists
-    const existing = db.prepare('SELECT id FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = "pending"').get(senderId, receiverId);
+    const existing = db.prepare("SELECT id FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'").get(senderId, receiverId);
     if (existing) {
       return res.json({ success: true, requestId: existing.id, message: 'Request already sent' });
     }
@@ -707,7 +707,7 @@ app.post('/api/friend-requests/:id/accept', (req, res) => {
     const request = db.prepare('SELECT * FROM friend_requests WHERE id = ?').get(req.params.id);
     if (!request) return res.status(404).json({ error: 'Request not found' });
 
-    db.prepare('UPDATE friend_requests SET status = "accepted" WHERE id = ?').run(req.params.id);
+    db.prepare("UPDATE friend_requests SET status = 'accepted' WHERE id = ?").run(req.params.id);
 
     // Add bidirectional friend link
     const f1 = `f_${Date.now()}_1`;
@@ -744,7 +744,7 @@ app.post('/api/friend-requests/:id/reject', (req, res) => {
 app.post('/api/friend-requests/cancel', (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
-    db.prepare('DELETE FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = "pending"').run(senderId, receiverId);
+    db.prepare("DELETE FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'").run(senderId, receiverId);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
