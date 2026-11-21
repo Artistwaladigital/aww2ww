@@ -239,7 +239,12 @@ export const DesktopSidebar: React.FC = () => {
 
       {/* Footer */}
       <div className="px-2 text-[11px] text-gray-400 space-y-1">
-        <p>Privacy • Terms • Advertising • Cookies</p>
+        <p>
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-purple-600 transition-colors">Privacy</a> •{' '}
+          <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-purple-600 transition-colors">Terms</a> •{' '}
+          <a href="/data-deletion" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-purple-600 transition-colors">Data Deletion</a> •{' '}
+          <a href="/privacy#cookies" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-purple-600 transition-colors">Cookies</a>
+        </p>
         <p>© 2026 aww2ww Inc. • Real People • Real Vibes</p>
       </div>
     </aside>

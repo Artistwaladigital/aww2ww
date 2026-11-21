@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — aww2ww</title>
+  <meta name="description" content="Privacy Policy for aww2ww - Real People, Real Connections. Learn how we collect, use, and protect your information.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --accent: #ec4899;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-heart {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .btn-home {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-home:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    .main-wrap {
+      max-width: 960px;
+      margin: 40px auto 80px;
+      padding: 0 24px;
+    }
+
+    /* Hero Banner */
+    .hero-card {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%);
+      color: #ffffff;
+      border-radius: 24px;
+      padding: 48px 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 35px -10px rgba(124, 58, 237, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero-card h1 {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-card p {
+      font-size: 15px;
+      opacity: 0.92;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .meta-tag {
+      background: rgba(0, 0, 0, 0.15);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    /* Policy Content */
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 48px 44px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Table of contents quick jumps */
+    .toc-box {
+      background: #f3f0ff;
+      border: 1px solid #e9d5ff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 36px;
+    }
+
+    .toc-box h3 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 8px 16px;
+      list-style: none;
+    }
+
+    .toc-grid a {
+      color: #581c87;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .toc-grid a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* Section Styles */
+    section {
+      margin-bottom: 40px;
+      scroll-margin-top: 90px;
+    }
+
+    section:last-child {
+      margin-bottom: 0;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #f3e8ff;
+      padding-bottom: 8px;
+    }
+
+    .section-num {
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      margin-bottom: 14px;
+    }
+
+    ul, ol {
+      margin: 12px 0 18px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    strong {
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    /* Highlighting Callout Boxes */
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: #faf5ff;
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .callout.danger {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .callout.success {
+      border-left-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 13.5px;
+      color: #374151;
+    }
+
+    /* Data Table */
+    .data-table-wrap {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #f5f3ff;
+      color: #4c1d95;
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 2px solid #ddd6fe;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    tr:hover td {
+      background: #faf5ff;
+    }
+
+    /* Footer */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 32px 24px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .hero-card {
+        padding: 32px 24px;
+      }
+      .hero-card h1 {
+        font-size: 26px;
+      }
+      .content-card {
+        padding: 28px 20px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span>aww2ww</span>
+        <span class="brand-heart">♥</span>
+      </a>
+      <div class="nav-links">
+        <a href="/terms" class="nav-link">Terms of Service</a>
+        <a href="/data-deletion" class="nav-link">Data Deletion</a>
+        <a href="/" class="btn-home">Open App</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Wrap -->
+  <main class="main-wrap">
+    
+    <!-- Hero Header -->
+    <div class="hero-card">
+      <div class="hero-badge">Official Policy • Google Play Compliant</div>
+      <h1>Privacy Policy</h1>
+      <p>
+        At <strong>aww2ww</strong>, we value your trust and are committed to protecting your personal data, privacy, and media uploads. This policy explains what information we collect, why we collect it, how it is secured, and your rights as a creator and user.
+      </p>
+      <div class="meta-tags">
+        <span class="meta-tag">Application: <strong>aww2ww (com.aww2ww.app)</strong></span>
+        <span class="meta-tag">Effective Date: <strong>November 21, 2026</strong></span>
+        <span class="meta-tag">Entity: <strong>aww2ww Inc. / Artistwala Digital</strong></span>
+        <span class="meta-tag">Scope: <strong>Web & Android App</strong></span>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+
+      <!-- Table of Contents -->
+      <div class="toc-box">
+        <h3>Quick Navigation</h3>
+        <ul class="toc-grid">
+          <li><a href="#overview">1. Overview & Applicability</a></li>
+          <li><a href="#collection">2. Information We Collect</a></li>
+          <li><a href="#usage">3. How We Use Information</a></li>
+          <li><a href="#storage">4. Storage & Media Hosting (Cloudflare R2)</a></li>
+          <li><a href="#sharing">5. Sharing & Disclosure Policy</a></li>
+          <li><a href="#messaging">6. Instant Messaging & Friends Privacy</a></li>
+          <li><a href="#retention">7. Data Retention & Account Deletion</a></li>
+          <li><a href="#children">8. Children's Privacy (Under 13)</a></li>
+          <li><a href="#security">9. Security Safeguards</a></li>
+          <li><a href="#cookies">10. Cookies & Local Storage</a></li>
+          <li><a href="#rights">11. Your Privacy Rights</a></li>
+          <li><a href="#contact">12. Contact Information</a></li>
+        </ul>
+      </div>
+
+      <!-- Section 1 -->
+      <section id="overview">
+        <h2><span class="section-num">1.</span> Overview & Applicability</h2>
+        <p>
+          This Privacy Policy governs the <strong>aww2ww</strong> native Android mobile application (Package ID: <code>com.aww2ww.app</code>) and the official website located at <a href="https://aww2ww.com" style="color:var(--primary); font-weight:600;">https://aww2ww.com</a>, operated by <strong>aww2ww Inc.</strong> ("we", "us", or "our").
+        </p>
+        <p>
+          By creating an account, downloading our app, or using any of our creator features, feed services, reels, or messaging features, you acknowledge that you have read and agreed to the practices described in this Privacy Policy.
+        </p>
+      </section>
+
+      <!-- Section 2 -->
+      <section id="collection">
+        <h2><span class="section-num">2.</span> Information We Collect</h2>
+        <p>
+          We only collect the minimum information required to deliver a safe, personalized, and high-performance social networking experience:
+        </p>
+
+        <div class="data-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data Category</th>
+                <th>Examples</th>
+                <th>Why It Is Collected</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Profile & Account Information</strong></td>
+                <td>Full name, chosen username, email address, password hash, avatar/profile image, cover image, biography, category (Creator/Artist/Lifestyle).</td>
+                <td>To set up your account, authenticate you securely, and display your public profile to people you choose to connect with.</td>
+              </tr>
+              <tr>
+                <td><strong>User-Generated Content</strong></td>
+                <td>Reels video files, photo posts, stories, captions, comments, and like/reaction interactions.</td>
+                <td>To display your posts in the community feed, enable high-definition reel streaming, and allow followers to discover your creations.</td>
+              </tr>
+              <tr>
+                <td><strong>Private Communication</strong></td>
+                <td>Direct 1-on-1 text messages, voice notes, and shared chat media sent between friends.</td>
+                <td>To facilitate private messaging between you and your confirmed friends. Private chats are strictly restricted to the participating users.</td>
+              </tr>
+              <tr>
+                <td><strong>Friendships & Social Graph</strong></td>
+                <td>Sent and received friend requests, accepted friendships, follower counts, and community hub memberships.</td>
+                <td>To manage your social circle, send friendship notifications, and show suggested connections in your location.</td>
+              </tr>
+              <tr>
+                <td><strong>Device & Log Data</strong></td>
+                <td>Device model, operating system version, browser user agent, IP address, and network request logs.</td>
+                <td>For platform security, preventing bot spam or unauthorized account access, and diagnosing server performance.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <p>
+            <strong>Note on Sensitive Data:</strong> We do <strong>not</strong> collect financial payment card numbers, biometric identifiers, or precise real-time GPS tracking data. Account registration only requires a name, username, and email.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="usage">
+        <h2><span class="section-num">3.</span> How We Use Your Information</h2>
+        <p>We process your personal information strictly for the following purposes:</p>
+        <ul>
+          <li><strong>Delivering Core Social Features:</strong> Allowing you to publish reels, post photos, follow creators, send friend requests, and exchange private messages.</li>
+          <li><strong>Ultra Fast Media Delivery:</strong> Transcoding and streaming uploaded video reels and images through our CDN and Cloudflare R2 object storage with minimal latency.</li>
+          <li><strong>Notifications:</strong> Alerting you when someone sends you a friend request, accepts your friendship, leaves a comment, or sends you a direct message.</li>
+          <li><strong>Account & Community Safety:</strong> Identifying and blocking malicious activity, fake spam accounts, abuse, harassment, or illegal content.</li>
+          <li><strong>Platform Improvements:</strong> Monitoring app stability, resolving crash reports, and enhancing user interface responsiveness.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4 -->
+      <section id="storage">
+        <h2><span class="section-num">4.</span> Storage & Media Hosting (Cloudflare R2)</h2>
+        <p>
+          aww2ww uses enterprise-grade infrastructure to protect your media and account information:
+        </p>
+        <ul>
+          <li><strong>Account & Relational Data:</strong> Stored on our dedicated, secured production servers equipped with modern TLS 1.3 encryption. Passwords are never stored in plain text.</li>
+          <li><strong>Video & Image Storage:</strong> High-definition video reels and user-uploaded media are safely stored in **Cloudflare R2 Object Storage** (Bucket: <code>aww2ww-media</code>) and distributed globally via Cloudflare’s CDN. This ensures fast playback without degrading video quality or risking data leakage.</li>
+        </ul>
+      </section>
+
+      <!-- Section 5 -->
+      <section id="sharing">
+        <h2><span class="section-num">5.</span> Sharing & Disclosure Policy</h2>
+        <div class="callout success">
+          <p>
+            <strong>We Do Not Sell Your Data:</strong> aww2ww does <strong>never</strong> sell, rent, monetize, or trade your personal information or contact details to third-party data brokers or marketing firms.
+          </p>
+        </div>
+        <p>Information is only shared under these limited scenarios:</p>
+        <ul>
+          <li><strong>Public Profile & Content:</strong> Content you post publicly (such as public reels and posts) is visible to other visitors and creators on the platform.</li>
+          <li><strong>Infrastructure Providers:</strong> Trusted cloud infrastructure vendors (e.g., Cloudflare for media CDN, Hostinger for secure server hosting) who operate under strict confidentiality agreements.</li>
+          <li><strong>Legal Requirements:</strong> If compelled by lawful court orders, subpoenas, or applicable Indian and international law enforcement requests to protect the rights, property, or safety of aww2ww and our users.</li>
+        </ul>
+      </section>
+
+      <!-- Section 6 -->
+      <section id="messaging">
+        <h2><span class="section-num">6.</span> Instant Messaging & Friends Privacy</h2>
+        <p>
+          We respect the privacy of your personal conversations:
+        </p>
+        <ul>
+          <li><strong>No Mock or Fake Messages:</strong> When you open a new profile, your inbox is completely private and empty. No unsolicited promotional messages or fake connections are seeded.</li>
+          <li><strong>Friendship Scoping:</strong> Only users who have exchanged and accepted friend requests can start 1-on-1 direct messaging threads.</li>
+          <li><strong>Private Access Control:</strong> Conversation threads are accessible exclusively by the two participating accounts. Neither third parties nor other community members can read your private messages.</li>
+        </ul>
+      </section>
+
+      <!-- Section 7 -->
+      <section id="retention">
+        <h2><span class="section-num">7.</span> Data Retention & Account Deletion Policy</h2>
+        <p>
+          In accordance with Google Play Developer Policy and global data protection guidelines (including GDPR and Indian DPDP), you have full control over your data:
+        </p>
+        <div class="callout danger">
+          <p>
+            <strong>Right to Deletion:</strong> You have the unconditional right to delete your account and all associated data at any time.
+          </p>
+        </div>
+        <p>
+          <strong>How to Delete Your Account:</strong>
+        </p>
+        <ol>
+          <li><strong>Inside the App:</strong> Log in to aww2ww, navigate to <strong>Menu ➔ Settings ➔ Delete Account</strong> and confirm your request.</li>
+          <li><strong>Via Email Request:</strong> Send an email from your registered email address to <a href="mailto:privacy@aww2ww.com" style="color:var(--primary); font-weight:700;">privacy@aww2ww.com</a> or <a href="mailto:support@aww2ww.com" style="color:var(--primary); font-weight:700;">support@aww2ww.com</a> with the subject <em>"Account Deletion Request"</em> and your username.</li>
+          <li><strong>Web Deletion Portal:</strong> Visit our dedicated <a href="/data-deletion" style="color:var(--primary); font-weight:700;">Data Deletion Request Page</a> to initiate immediate data removal.</li>
+        </ol>
+        <p>
+          <strong>What Happens Upon Deletion:</strong> Within 30 days of your request, your profile, authentication credentials, photos, video reels in Cloudflare R2, comments, friend connections, and chat messages will be permanently deleted and purged from our active systems.
+        </p>
+      </section>
+
+      <!-- Section 8 -->
+      <section id="children">
+        <h2><span class="section-num">8.</span> Children's Privacy (Under 13)</h2>
+        <p>
+          aww2ww is strictly intended for individuals who are at least <strong>13 years old</strong> (or the minimum legal age for social media in your country).
+        </p>
+        <p>
+          We do not knowingly collect, solicit, or maintain personal information from children under the age of 13. If we become aware that an account has been registered by an individual under 13 without verifiable parental consent, we will promptly delete that account, its media uploads, and all associated personal records.
+        </p>
+      </section>
+
+      <!-- Section 9 -->
+      <section id="security">
+        <h2><span class="section-num">9.</span> Security Safeguards</h2>
+        <p>
+          We employ robust organizational and technical security measures to safeguard your personal data:
+        </p>
+        <ul>
+          <li><strong>HTTPS / TLS 1.3:</strong> All communications between your mobile device, browser, and our API servers are encrypted using modern Transport Layer Security certificates.</li>
+          <li><strong>Isolated Cloud Containers:</strong> Production application containers operate in isolated Docker environments behind reverse proxies (Traefik) with DDoS mitigation.</li>
+          <li><strong>Access Restrictions:</strong> Database access is restricted to authenticated server processes with no open external database ports.</li>
+        </ul>
+      </section>
+
+      <!-- Section 10 -->
+      <section id="cookies">
+        <h2><span class="section-num">10.</span> Cookies & Local Storage</h2>
+        <p>
+          aww2ww utilizes browser cookies and local storage tokens exclusively to maintain your active login session, remember your selected interface language (English / Bengali / Banglish), and preserve your layout preferences.
+        </p>
+        <p>
+          We do not use third-party invasive tracking cookies to profile your browsing history on external websites.
+        </p>
+      </section>
+
+      <!-- Section 11 -->
+      <section id="rights">
+        <h2><span class="section-num">11.</span> Your Privacy Rights</h2>
+        <p>Depending on your jurisdiction, you are entitled to several rights regarding your personal data:</p>
+        <ul>
+          <li><strong>Right to Access:</strong> You can request a summary of the personal data we hold about you.</li>
+          <li><strong>Right to Correction:</strong> You can edit your display name, bio, profile photo, and account details directly in your profile settings.</li>
+          <li><strong>Right to Portability:</strong> You can request an export of your uploaded photos and reels.</li>
+          <li><strong>Right to Withdraw Consent:</strong> You may log out or request complete account deletion at any time.</li>
+        </ul>
+      </section>
+
+      <!-- Section 12 -->
+      <section id="contact">
+        <h2><span class="section-num">12.</span> Contact Us</h2>
+        <p>
+          If you have questions, feedback, or data privacy concerns regarding this policy or our mobile app, please reach out to our dedicated privacy and safety team:
+        </p>
+        <div class="callout">
+          <p><strong>aww2ww Team — Privacy & Legal Department</strong></p>
+          <p>Operating Entity: <strong>aww2ww Inc. / Artistwala Digital</strong></p>
+          <p>Email: <a href="mailto:privacy@aww2ww.com" style="color:var(--primary); font-weight:700;">privacy@aww2ww.com</a> | <a href="mailto:support@aww2ww.com" style="color:var(--primary); font-weight:700;">support@aww2ww.com</a></p>
+          <p>Official Website: <a href="https://aww2ww.com" style="color:var(--primary); font-weight:700;">https://aww2ww.com</a></p>
+          <p>Address: Kolkata, West Bengal, India</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/data-deletion">Data Deletion</a>
+      <a href="mailto:support@aww2ww.com">Support</a>
+    </div>
+    <p>© 2026 aww2ww Inc. • Real People • Real Connections • All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>

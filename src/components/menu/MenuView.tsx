@@ -8,7 +8,9 @@ import {
   Monitor, 
   LogOut, 
   LogIn, 
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TopTabs } from '../common/TopTabs';
@@ -229,6 +231,63 @@ export const MenuView: React.FC = () => {
               <span>Sign In to aww2ww</span>
             </button>
           )}
+        </div>
+
+        {/* Legal & Privacy Policy (Google Play Compliant) */}
+        <div className="bg-white rounded-2xl p-2 shadow-xs border border-purple-50 text-left divide-y divide-gray-50">
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-2.5 hover:bg-purple-50/50 rounded-xl cursor-pointer text-decoration-none"
+          >
+            <div className="flex items-center space-x-3 text-xs font-bold text-gray-800">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="block">Privacy Policy</span>
+                <span className="text-[10px] text-gray-400 font-normal">How your data & media are protected</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </a>
+
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-2.5 hover:bg-purple-50/50 rounded-xl cursor-pointer text-decoration-none"
+          >
+            <div className="flex items-center space-x-3 text-xs font-bold text-gray-800">
+              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="block">Terms of Service</span>
+                <span className="text-[10px] text-gray-400 font-normal">Community guidelines & creator rules</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </a>
+
+          <a
+            href="/data-deletion"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-2.5 hover:bg-purple-50/50 rounded-xl cursor-pointer text-decoration-none"
+          >
+            <div className="flex items-center space-x-3 text-xs font-bold text-rose-600">
+              <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                <LogOut className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="block">Data Deletion Request</span>
+                <span className="text-[10px] text-gray-400 font-normal">Purge account, reels & data</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </a>
         </div>
 
         {/* About App Footer */}

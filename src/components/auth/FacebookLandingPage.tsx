@@ -382,7 +382,10 @@ export const FacebookLandingPage: React.FC = () => {
 
               {/* Terms of Service notice */}
               <p className="text-[10px] text-gray-500 leading-tight">
-                By clicking Sign Up, you agree to aww2ww's Terms, Privacy Policy and Cookies Policy.
+                By clicking Sign Up, you agree to aww2ww's{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-semibold hover:underline">Terms of Service</a>,{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-semibold hover:underline">Privacy Policy</a> and{' '}
+                <a href="/privacy#cookies" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-semibold hover:underline">Cookies Policy</a>.
               </p>
 
               {/* Submit Button */}
@@ -422,16 +425,16 @@ export const FacebookLandingPage: React.FC = () => {
           </div>
           <div className="border-t border-gray-100 my-2"></div>
           <div className="flex flex-wrap justify-center lg:justify-start gap-x-4 gap-y-1 text-[11px] text-gray-500">
-            <span>Sign Up</span>
-            <span>Log In</span>
-            <span>Reels</span>
-            <span>Messenger</span>
-            <span>Stories</span>
-            <span>Community</span>
-            <span>Creators</span>
-            <span>Help Center</span>
-            <span>Privacy</span>
-            <span>Terms</span>
+            <span className="cursor-pointer hover:underline" onClick={() => setIsSignUpModalOpen(true)}>Sign Up</span>
+            <span className="cursor-pointer hover:underline" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Log In</span>
+            <span className="cursor-pointer hover:underline">Reels</span>
+            <span className="cursor-pointer hover:underline">Messenger</span>
+            <span className="cursor-pointer hover:underline">Community</span>
+            <span className="cursor-pointer hover:underline">Creators</span>
+            <a href="/privacy" className="hover:underline text-gray-600 font-medium">Privacy Policy</a>
+            <a href="/terms" className="hover:underline text-gray-600 font-medium">Terms</a>
+            <a href="/data-deletion" className="hover:underline text-gray-600 font-medium">Data Deletion</a>
+            <a href="mailto:support@aww2ww.com" className="hover:underline text-gray-600 font-medium">Support</a>
           </div>
           <p className="text-[11px] text-gray-400 pt-2 text-center lg:text-left">
             aww2ww © 2026 • Real People • Real Connections

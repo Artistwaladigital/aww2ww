@@ -1061,7 +1061,32 @@ app.post('/api/reels', (req, res) => {
   }
 });
 
-// 8. Serve Frontend in Production
+// 8. Legal, Privacy & Static Policy Pages (Google Play Store Compliant)
+app.get(['/privacy', '/privacy-policy'], (req, res) => {
+  const distFile = path.join(__dirname, 'dist', 'privacy.html');
+  const pubFile = path.join(__dirname, 'public', 'privacy.html');
+  if (fs.existsSync(distFile)) return res.sendFile(distFile);
+  if (fs.existsSync(pubFile)) return res.sendFile(pubFile);
+  res.redirect('/');
+});
+
+app.get(['/terms', '/terms-of-service'], (req, res) => {
+  const distFile = path.join(__dirname, 'dist', 'terms.html');
+  const pubFile = path.join(__dirname, 'public', 'terms.html');
+  if (fs.existsSync(distFile)) return res.sendFile(distFile);
+  if (fs.existsSync(pubFile)) return res.sendFile(pubFile);
+  res.redirect('/');
+});
+
+app.get(['/data-deletion', '/delete-account'], (req, res) => {
+  const distFile = path.join(__dirname, 'dist', 'data-deletion.html');
+  const pubFile = path.join(__dirname, 'public', 'data-deletion.html');
+  if (fs.existsSync(distFile)) return res.sendFile(distFile);
+  if (fs.existsSync(pubFile)) return res.sendFile(pubFile);
+  res.redirect('/');
+});
+
+// 9. Serve Frontend in Production
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));

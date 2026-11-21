@@ -205,8 +205,14 @@ export const RegisterScreen: React.FC = () => {
               className="w-3.5 h-3.5 text-purple-600 rounded-xs border-purple-300 focus:ring-purple-400"
             />
             <label htmlFor="terms" className="text-[10px] text-gray-500">
-              I agree to the <span className="text-purple-600 font-semibold">Terms of Service</span> and{' '}
-              <span className="text-purple-600 font-semibold">Privacy Policy</span>
+              I agree to the{' '}
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-semibold hover:underline">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-semibold hover:underline">
+                Privacy Policy
+              </a>
             </label>
           </div>
 
