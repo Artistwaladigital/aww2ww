@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    // Primary VPS IP endpoint (instant, direct)
-    const val BASE_URL = "http://201.18.203.238/api/"
+    // Primary Production HTTPS domain endpoint for Google Play Store
+    const val BASE_URL = "https://aww2ww.com/api/"
 
     private val okHttpClient: OkHttpClient by lazy {
         val logging = HttpLoggingInterceptor().apply {
