@@ -250,20 +250,19 @@ app.post('/api/users/register', (req, res) => {
 
     const newUser = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 
-    // Create a welcome chat thread with Ananya Saha
+    // Add a single welcome notification (No fake chats or fake friends!)
     try {
-      const chatId = `chat_${userId}_ananya`;
       db.prepare(`
-        INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
-        VALUES (?, ?, 0, null, null, ?, ?)
-      `).run(chatId, 'user_ananya', 'Welcome to aww2ww! 💜 Say hi!', 'Just now');
-
-      db.prepare(`
-        INSERT INTO messages (id, chat_id, sender_id, text, media_url, media_type, status, created_at)
-        VALUES (?, ?, ?, ?, null, null, 'sent', ?)
-      `).run(`msg_welc_${Date.now()}`, chatId, 'user_ananya', `Welcome to aww2ww ${name.trim()}! 💜 Happy to connect with you!`, 'Just now');
-    } catch (chatErr) {
-      console.warn('Welcome chat warning:', chatErr.message);
+        INSERT INTO notifications (id, user_id, from_user_id, type, title, message, avatar, is_read, created_at)
+        VALUES (?, ?, null, 'welcome', 'Welcome to aww2ww! ✨', ?, null, 0, ?)
+      `).run(
+        `notif_${Date.now()}`,
+        userId,
+        `Welcome to aww2ww, ${name.trim()}! Connect with friends, watch reels, and share your moments.`,
+        'Just now'
+      );
+    } catch (notifErr) {
+      console.warn('Welcome notif warning:', notifErr.message);
     }
 
     res.status(201).json({ success: true, user: formatUser(newUser) });
@@ -601,36 +600,275 @@ app.get('/api/notes', (req, res) => {
   }
 });
 
-// 6. Chats
+// 6. Friends, Friend Requests & Notifications (Real Social Engine)
+
+// Get friends of a user
+app.get('/api/friends', (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.json([]);
+    const rows = db.prepare(`
+      SELECT u.* FROM friends f
+      JOIN users u ON u.id = f.friend_id
+      WHERE f.user_id = ?
+    `).all(userId);
+    res.json(rows.map(formatUser));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get incoming pending friend requests for a user
+app.get('/api/friend-requests', (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.json([]);
+    const rows = db.prepare(`
+      SELECT fr.id, fr.created_at, u.id as sender_id, u.name, u.username, u.avatar, u.location, u.verified
+      FROM friend_requests fr
+      JOIN users u ON u.id = fr.sender_id
+      WHERE fr.receiver_id = ? AND fr.status = 'pending'
+      ORDER BY fr.rowid DESC
+    `).all(userId);
+    res.json(rows.map(r => ({
+      id: r.id,
+      senderId: r.sender_id,
+      name: r.name,
+      username: r.username,
+      avatar: r.avatar,
+      location: r.location,
+      verified: Boolean(r.verified),
+      time: r.created_at,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get sent friend requests (receiver IDs) by this user
+app.get('/api/friend-requests/sent', (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.json([]);
+    const rows = db.prepare(`
+      SELECT receiver_id FROM friend_requests
+      WHERE sender_id = ? AND status = 'pending'
+    `).all(userId);
+    res.json(rows.map(r => r.receiver_id));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Send a friend request
+app.post('/api/friend-requests', (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    if (!senderId || !receiverId) {
+      return res.status(400).json({ error: 'senderId and receiverId are required' });
+    }
+
+    // Check if already friends
+    const alreadyFriends = db.prepare('SELECT id FROM friends WHERE user_id = ? AND friend_id = ?').get(senderId, receiverId);
+    if (alreadyFriends) {
+      return res.json({ success: true, message: 'Already friends' });
+    }
+
+    // Check if pending request exists
+    const existing = db.prepare('SELECT id FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = "pending"').get(senderId, receiverId);
+    if (existing) {
+      return res.json({ success: true, requestId: existing.id, message: 'Request already sent' });
+    }
+
+    const reqId = `fr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    db.prepare(`
+      INSERT INTO friend_requests (id, sender_id, receiver_id, status, created_at)
+      VALUES (?, ?, ?, 'pending', 'Just now')
+    `).run(reqId, senderId, receiverId);
+
+    // Send notification to receiver
+    const sender = db.prepare('SELECT name, avatar FROM users WHERE id = ?').get(senderId);
+    if (sender) {
+      db.prepare(`
+        INSERT INTO notifications (id, user_id, from_user_id, type, title, message, avatar, is_read, created_at)
+        VALUES (?, ?, ?, 'friend_request', 'Friend Request', ?, ?, 0, 'Just now')
+      `).run(`notif_${Date.now()}`, receiverId, senderId, `${sender.name} sent you a friend request.`, sender.avatar);
+    }
+
+    res.status(201).json({ success: true, requestId: reqId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Accept a friend request
+app.post('/api/friend-requests/:id/accept', (req, res) => {
+  try {
+    const request = db.prepare('SELECT * FROM friend_requests WHERE id = ?').get(req.params.id);
+    if (!request) return res.status(404).json({ error: 'Request not found' });
+
+    db.prepare('UPDATE friend_requests SET status = "accepted" WHERE id = ?').run(req.params.id);
+
+    // Add bidirectional friend link
+    const f1 = `f_${Date.now()}_1`;
+    const f2 = `f_${Date.now()}_2`;
+    db.prepare('INSERT OR IGNORE INTO friends (id, user_id, friend_id, created_at) VALUES (?, ?, ?, ?)').run(f1, request.sender_id, request.receiver_id, 'Just now');
+    db.prepare('INSERT OR IGNORE INTO friends (id, user_id, friend_id, created_at) VALUES (?, ?, ?, ?)').run(f2, request.receiver_id, request.sender_id, 'Just now');
+
+    // Notify sender that their request was accepted
+    const receiver = db.prepare('SELECT name, avatar FROM users WHERE id = ?').get(request.receiver_id);
+    if (receiver) {
+      db.prepare(`
+        INSERT INTO notifications (id, user_id, from_user_id, type, title, message, avatar, is_read, created_at)
+        VALUES (?, ?, ?, 'friend_accept', 'Friend Request Accepted', ?, ?, 0, 'Just now')
+      `).run(`notif_${Date.now()}`, request.sender_id, request.receiver_id, `${receiver.name} accepted your friend request! You are now friends.`, receiver.avatar);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Reject/Delete a friend request
+app.post('/api/friend-requests/:id/reject', (req, res) => {
+  try {
+    db.prepare('DELETE FROM friend_requests WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Cancel a sent friend request
+app.post('/api/friend-requests/cancel', (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    db.prepare('DELETE FROM friend_requests WHERE sender_id = ? AND receiver_id = ? AND status = "pending"').run(senderId, receiverId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get user suggestions (people not yet friends)
+app.get('/api/users/suggestions', (req, res) => {
+  try {
+    const { userId } = req.query;
+    let users;
+    if (userId) {
+      users = db.prepare(`
+        SELECT * FROM users
+        WHERE id != ?
+        AND id NOT IN (SELECT friend_id FROM friends WHERE user_id = ?)
+        ORDER BY rowid DESC LIMIT 15
+      `).all(userId, userId);
+    } else {
+      users = db.prepare('SELECT * FROM users ORDER BY rowid DESC LIMIT 15').all();
+    }
+    res.json(users.map(formatUser));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get notifications for a user
+app.get('/api/notifications', (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.json([]);
+    const notifs = db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY rowid DESC LIMIT 25').all(userId);
+    res.json(notifs.map(n => ({
+      id: n.id,
+      title: n.title,
+      message: n.message,
+      type: n.type,
+      avatar: n.avatar,
+      isRead: Boolean(n.is_read),
+      time: n.created_at,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Mark notifications read
+app.post('/api/notifications/read-all', (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (userId) {
+      db.prepare('UPDATE notifications SET is_read = 1 WHERE user_id = ?').run(userId);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 7. Chats (Scoped strictly to the requesting user)
 app.get('/api/chats', (req, res) => {
   try {
-    const chats = db.prepare('SELECT * FROM chats').all();
+    const { userId } = req.query;
+    let chats = [];
+
+    if (userId) {
+      // Find chats where this user is user1, user2, or in a group
+      chats = db.prepare(`
+        SELECT * FROM chats
+        WHERE user1_id = ? OR user2_id = ? OR is_group = 1
+        ORDER BY updated_at DESC
+      `).all(userId, userId);
+    } else {
+      // Unauthenticated / guest: return only public groups
+      chats = db.prepare('SELECT * FROM chats WHERE is_group = 1').all();
+    }
+
     const result = chats.map(c => {
       let participant = null;
-      if (c.participant_id) {
-        participant = db.prepare('SELECT * FROM users WHERE id = ?').get(c.participant_id);
-      } else {
+      let otherUserId = c.participant_id;
+
+      if (userId && !c.is_group) {
+        if (c.user1_id === userId) otherUserId = c.user2_id;
+        else if (c.user2_id === userId) otherUserId = c.user1_id;
+      }
+
+      if (otherUserId) {
+        participant = db.prepare('SELECT * FROM users WHERE id = ?').get(otherUserId);
+      }
+
+      if (!participant && !c.is_group) {
         participant = {
-          id: c.id,
-          name: c.group_name,
-          username: c.group_name.toLowerCase().replace(/\s+/g, ''),
-          avatar: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80',
-          verified: true,
-          online: true,
+          id: otherUserId || 'user_unknown',
+          name: 'aww2ww User',
+          username: 'user',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+          online: 0,
         };
       }
 
       const messages = db.prepare('SELECT * FROM messages WHERE chat_id = ? ORDER BY rowid ASC').all(c.id);
+      const unreadCount = userId ? messages.filter(m => m.sender_id !== userId && m.status !== 'read').length : 0;
 
       return {
         id: c.id,
         isGroup: Boolean(c.is_group),
         groupName: c.group_name,
         membersCount: c.members_count,
-        participant,
-        lastMessage: c.last_message,
+        participant: c.is_group ? {
+          id: c.id,
+          name: c.group_name || 'Group',
+          avatar: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80',
+          online: false
+        } : {
+          id: participant.id,
+          name: participant.name,
+          username: participant.username,
+          avatar: participant.avatar,
+          online: Boolean(participant.online)
+        },
+        lastMessage: c.last_message || 'Conversation started',
         timestamp: c.updated_at,
-        unreadCount: c.id === 'chat_ananya' ? 2 : 0,
+        unreadCount,
         messages: messages.map(m => ({
           id: m.id,
           senderId: m.sender_id,
@@ -652,15 +890,53 @@ app.get('/api/chats', (req, res) => {
 // Create or Start Chat
 app.post('/api/chats', (req, res) => {
   try {
-    const { participantId, isGroup, groupName } = req.body;
-    const chatId = `chat_${Date.now()}`;
+    const { userId, participantId, isGroup, groupName } = req.body;
+    if (!participantId && !isGroup) {
+      return res.status(400).json({ error: 'participantId is required' });
+    }
+
+    const currentUserId = userId || 'user_guest';
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // Check if 1-on-1 chat already exists
+    if (!isGroup && participantId) {
+      const existing = db.prepare(`
+        SELECT * FROM chats
+        WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)
+      `).get(currentUserId, participantId, participantId, currentUserId);
+
+      if (existing) {
+        const participant = db.prepare('SELECT * FROM users WHERE id = ?').get(participantId);
+        const messages = db.prepare('SELECT * FROM messages WHERE chat_id = ? ORDER BY rowid ASC').all(existing.id);
+        return res.json({
+          id: existing.id,
+          isGroup: false,
+          participant: participant ? formatUser(participant) : { id: participantId, name: 'User', avatar: '' },
+          lastMessage: existing.last_message,
+          timestamp: existing.updated_at,
+          unreadCount: 0,
+          messages: messages.map(m => ({
+            id: m.id,
+            senderId: m.sender_id,
+            text: m.text,
+            mediaUrl: m.media_url,
+            mediaType: m.media_type,
+            status: m.status,
+            timestamp: m.created_at,
+          }))
+        });
+      }
+    }
+
+    const chatId = `chat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
     db.prepare(`
-      INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO chats (id, user1_id, user2_id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       chatId,
+      currentUserId,
+      participantId || null,
       participantId || null,
       isGroup ? 1 : 0,
       groupName || null,
@@ -678,7 +954,12 @@ app.post('/api/chats', (req, res) => {
       id: chatId,
       isGroup: Boolean(isGroup),
       groupName,
-      participant,
+      participant: participant || {
+        id: participantId || 'user_unknown',
+        name: groupName || 'Group',
+        avatar: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80',
+        online: false
+      },
       lastMessage: 'Conversation started',
       timestamp: timeStr,
       unreadCount: 0,
@@ -692,21 +973,21 @@ app.post('/api/chats', (req, res) => {
 app.post('/api/chats/:id/messages', (req, res) => {
   try {
     const { senderId, text, mediaUrl } = req.body;
-    const msgId = `msg_${Date.now()}`;
+    const msgId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // Ensure chat thread exists in database
-    const existingChat = db.prepare('SELECT id FROM chats WHERE id = ?').get(req.params.id);
+    const existingChat = db.prepare('SELECT * FROM chats WHERE id = ?').get(req.params.id);
     if (!existingChat) {
       db.prepare(`
-        INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
-        VALUES (?, ?, 0, null, null, ?, ?)
-      `).run(req.params.id, 'user_ananya', text || 'New message', timeStr);
+        INSERT INTO chats (id, user1_id, user2_id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+        VALUES (?, ?, ?, ?, 0, null, null, ?, ?)
+      `).run(req.params.id, senderId, 'user_ananya', 'user_ananya', text || 'New message', timeStr);
     }
 
-    // Ensure sender exists in DB so foreign key constraint passes
-    const sender = db.prepare('SELECT id FROM users WHERE id = ?').get(senderId || 'user_tania');
-    const validSenderId = sender ? sender.id : 'user_tania';
+    // Ensure sender exists in DB
+    const sender = db.prepare('SELECT id FROM users WHERE id = ?').get(senderId);
+    const validSenderId = sender ? sender.id : senderId;
 
     db.prepare(`
       INSERT INTO messages (id, chat_id, sender_id, text, media_url, media_type, status, created_at)

@@ -86,10 +86,136 @@ export const apiClient = {
     }
   },
 
-  async getChats() {
+  async getChats(userId?: string) {
     try {
-      const res = await fetch(`${API_URL}/chats`);
+      const url = userId ? `${API_URL}/chats?userId=${encodeURIComponent(userId)}` : `${API_URL}/chats`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  async getFriends(userId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friends?userId=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async getFriendRequests(userId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests?userId=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async getSentFriendRequests(userId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests/sent?userId=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async sendFriendRequest(senderId: string, receiverId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderId, receiverId }),
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to send request' };
+    }
+  },
+
+  async acceptFriendRequest(requestId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests/${requestId}/accept`, {
+        method: 'POST',
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to accept request' };
+    }
+  },
+
+  async rejectFriendRequest(requestId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests/${requestId}/reject`, {
+        method: 'POST',
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to reject request' };
+    }
+  },
+
+  async cancelFriendRequest(senderId: string, receiverId: string) {
+    try {
+      const res = await fetch(`${API_URL}/friend-requests/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderId, receiverId }),
+      });
+      return await res.json();
+    } catch {
+      return { error: 'Failed to cancel request' };
+    }
+  },
+
+  async getUserSuggestions(userId?: string) {
+    try {
+      const url = userId ? `${API_URL}/users/suggestions?userId=${encodeURIComponent(userId)}` : `${API_URL}/users/suggestions`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async getNotifications(userId: string) {
+    try {
+      const res = await fetch(`${API_URL}/notifications?userId=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch {
+      return [];
+    }
+  },
+
+  async markNotificationsRead(userId: string) {
+    try {
+      const res = await fetch(`${API_URL}/notifications/read-all`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  async createChat(userId: string, participantId: string, isGroup?: boolean, groupName?: string) {
+    try {
+      const res = await fetch(`${API_URL}/chats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, participantId, isGroup, groupName }),
+      });
       return await res.json();
     } catch {
       return null;
@@ -145,19 +271,6 @@ export const apiClient = {
       return await res.json();
     } catch {
       return { error: 'Failed to update profile' };
-    }
-  },
-
-  async createChat(participantId: string, isGroup?: boolean, groupName?: string) {
-    try {
-      const res = await fetch(`${API_URL}/chats`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participantId, isGroup, groupName }),
-      });
-      return await res.json();
-    } catch {
-      return null;
     }
   },
 };

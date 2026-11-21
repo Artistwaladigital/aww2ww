@@ -7,8 +7,9 @@ import {
   Store, 
   Users, 
   MessageCircle, 
-  CheckCircle2, 
-  Sparkles 
+  UserPlus,
+  Check,
+  CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import type { TabType } from '../../context/AppContext';
@@ -20,68 +21,56 @@ export const DesktopSidebar: React.FC = () => {
     setActiveTab, 
     currentUser, 
     setProfileUser, 
-    showToast,
+    friends,
+    sentFriendRequests,
+    sendFriendRequest,
+    pendingFriendRequestsCount,
+    unreadMessagesCount,
     t 
   } = useApp();
 
   const navItems: { id: TabType; label: string; icon: any; badge?: string }[] = [
     { id: 'home', label: t.home, icon: Home },
-    { id: 'friends', label: t.friends, icon: Users, badge: '2 new' },
+    { 
+      id: 'friends', 
+      label: t.friends, 
+      icon: Users, 
+      badge: pendingFriendRequestsCount > 0 ? `${pendingFriendRequestsCount} new` : undefined 
+    },
     { id: 'reels', label: t.reels, icon: Clapperboard, badge: 'Hot' },
-    { id: 'messenger', label: t.messages, icon: MessageCircle, badge: '5' },
+    { 
+      id: 'messenger', 
+      label: t.messages, 
+      icon: MessageCircle, 
+      badge: unreadMessagesCount > 0 ? String(unreadMessagesCount) : undefined 
+    },
     { id: 'groups', label: t.groups, icon: Users2 },
     { id: 'watch', label: t.watch, icon: Tv },
     { id: 'marketplace', label: t.marketplace, icon: Store },
   ];
 
-  const demoProfiles = [
+  const suggestedPeople = [
+    ANANYA_SAHA,
+    MOCK_USERS.mousumi,
+    MOCK_USERS.riya,
     {
-      user: currentUser,
-      title: `${currentUser.name} (You)`,
-      subtitle: `${currentUser.category || 'Creator'} • ${currentUser.followers || '0'} Followers`,
-      badge: 'You',
+      id: 'user_arif',
+      name: 'Arif Hossain',
+      username: 'arifhossain',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+      verified: true,
+      online: true,
+      category: 'Tech Vlogger',
+      followers: '730K',
+      following: '340',
+      postsCount: 210,
+      bio: 'Tech reviews & travel stories from Dhaka & Kolkata 🚀',
+      location: 'Dhaka / Kolkata',
+      joinedDate: 'Joined May 2023',
+      coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
+      hasStory: true,
     },
-    {
-      user: ANANYA_SAHA,
-      title: 'Ananya Saha ✓',
-      subtitle: 'Creator • 2.4M Followers',
-      badge: 'Top Creator',
-    },
-    {
-      user: MOCK_USERS.mousumi,
-      title: 'Mousumi Das ✓',
-      subtitle: 'Travel Blogger • 560K',
-      badge: 'Travel',
-    },
-    {
-      user: MOCK_USERS.riya,
-      title: 'Riya Sen',
-      subtitle: 'Content Creator • 320K',
-      badge: 'Creator',
-    },
-    {
-      user: {
-        id: 'user_arif',
-        name: 'Arif Hossain',
-        username: 'arifhossain',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-        verified: true,
-        online: true,
-        category: 'Tech Vlogger',
-        followers: '730K',
-        following: '340',
-        postsCount: 210,
-        bio: 'Tech reviews & travel stories from Dhaka & Kolkata 🚀',
-        location: 'Dhaka / Kolkata',
-        joinedDate: 'Joined May 2023',
-        coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
-        hasStory: true,
-      },
-      title: 'Arif Hossain ✓',
-      subtitle: 'Tech Vlogger • 730K',
-      badge: 'Tech',
-    },
-  ];
+  ].filter(u => u.id !== currentUser.id);
 
   const shortcuts = [
     {
@@ -163,43 +152,66 @@ export const DesktopSidebar: React.FC = () => {
         })}
       </div>
 
-      {/* Demo Profiles Quick Switcher */}
+      {/* Suggested People / Creators to Connect */}
       <div className="bg-white rounded-2xl p-3 border border-purple-50 shadow-2xs">
         <div className="flex items-center space-x-1.5 mb-2.5">
-          <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+          <UserPlus className="w-3.5 h-3.5 text-purple-600" />
           <span className="text-[11px] font-extrabold text-gray-800 uppercase tracking-wider">
-            Explore Demo Profiles
+            Suggested People
           </span>
         </div>
 
-        <div className="space-y-1.5">
-          {demoProfiles.map((p, idx) => (
-            <div
-              key={idx}
-              onClick={() => {
-                setProfileUser(p.user);
-                setActiveTab('profile');
-                showToast(`Viewing ${p.user.name}'s profile ✨`);
-              }}
-              className="flex items-center justify-between p-1.5 rounded-xl hover:bg-purple-50/70 cursor-pointer transition-colors"
-            >
-              <div className="flex items-center space-x-2.5">
-                <img
-                  src={p.user.avatar}
-                  alt={p.user.name}
-                  className="w-8 h-8 rounded-full object-cover ring-1 ring-purple-200"
-                />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-gray-900 leading-tight">{p.title}</span>
-                  <span className="text-[10px] text-gray-500">{p.subtitle}</span>
-                </div>
-              </div>
+        <div className="space-y-2">
+          {suggestedPeople.map((user) => {
+            const isFriend = friends.some(f => f.id === user.id);
+            const isRequested = sentFriendRequests.includes(user.id);
 
-              <span className="text-[9px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded-md">
-                {p.badge}
-              </span>
-            </div>
-          ))}
+            return (
+              <div
+                key={user.id}
+                className="flex items-center justify-between p-1.5 rounded-xl hover:bg-purple-50/50 transition-colors"
+              >
+                <div 
+                  onClick={() => {
+                    setProfileUser(user);
+                    setActiveTab('profile');
+                  }}
+                  className="flex items-center space-x-2.5 cursor-pointer text-left"
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover ring-1 ring-purple-200"
+                  />
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-bold text-gray-900 leading-tight hover:underline">
+                      {user.name}
+                    </span>
+                    <span className="text-[10px] text-gray-500">{user.category || 'Creator'}</span>
+                  </div>
+                </div>
+
+                {isFriend ? (
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md flex items-center space-x-0.5">
+                    <Check className="w-3 h-3" />
+                    <span>Friend</span>
+                  </span>
+                ) : isRequested ? (
+                  <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-md">
+                    Sent
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => sendFriendRequest(user.id)}
+                    className="text-[10px] font-bold text-white bg-purple-600 hover:bg-purple-700 px-2.5 py-1 rounded-md shadow-2xs transition-colors flex items-center space-x-1"
+                  >
+                    <UserPlus className="w-3 h-3" />
+                    <span>Add</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

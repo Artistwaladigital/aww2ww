@@ -43,6 +43,22 @@ interface AppContextType {
   isFollowingCreator: boolean;
   toggleFollowCreator: () => void;
 
+  // Real Social Engine: Friends, Requests & Notifications
+  friends: User[];
+  friendRequests: any[];
+  sentFriendRequests: string[];
+  notifications: any[];
+  unreadMessagesCount: number;
+  pendingFriendRequestsCount: number;
+  unreadNotificationsCount: number;
+  sendFriendRequest: (receiverId: string) => Promise<boolean>;
+  acceptFriendRequest: (requestId: string) => Promise<boolean>;
+  rejectFriendRequest: (requestId: string) => Promise<boolean>;
+  cancelFriendRequest: (receiverId: string) => Promise<boolean>;
+  startChatWithUser: (user: { id: string; name: string; avatar: string; username?: string }) => Promise<void>;
+  markNotificationsRead: () => Promise<void>;
+  refreshSocialData: (userId?: string) => Promise<void>;
+
   // Data
   posts: Post[];
   stories: Story[];
@@ -142,10 +158,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
   const [stories, setStories] = useState<Story[]>(MOCK_STORIES);
-  const [chats, setChats] = useState<ChatThread[]>(MOCK_CHATS);
+  const [chats, setChats] = useState<ChatThread[]>(() => {
+    try {
+      const saved = localStorage.getItem('aww2ww_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        if (u.id !== 'user_tania') return [];
+      }
+    } catch {}
+    return MOCK_CHATS;
+  });
   const [reels, setReels] = useState<Reel[]>(MOCK_REELS);
   const [notes] = useState<Note[]>(MOCK_NOTES);
   const [songs] = useState<Song[]>(MOCK_SONGS);
+
+  // Real Social Engine States
+  const [friends, setFriends] = useState<User[]>([]);
+  const [friendRequests, setFriendRequests] = useState<any[]>([]);
+  const [sentFriendRequests, setSentFriendRequests] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   // Modals & Sheets
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
@@ -183,23 +214,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const refreshSocialData = React.useCallback(async (userId?: string) => {
+    const uid = userId || currentUser?.id;
+    if (!uid) return;
+    try {
+      const [dbFriends, dbReqs, dbSent, dbNotifs, dbChats] = await Promise.all([
+        apiClient.getFriends(uid),
+        apiClient.getFriendRequests(uid),
+        apiClient.getSentFriendRequests(uid),
+        apiClient.getNotifications(uid),
+        apiClient.getChats(uid),
+      ]);
+      if (Array.isArray(dbFriends)) setFriends(dbFriends);
+      if (Array.isArray(dbReqs)) setFriendRequests(dbReqs);
+      if (Array.isArray(dbSent)) setSentFriendRequests(dbSent);
+      if (Array.isArray(dbNotifs)) setNotifications(dbNotifs);
+      if (Array.isArray(dbChats)) setChats(dbChats);
+    } catch (e) {
+      console.warn('Failed to load social data:', e);
+    }
+  }, [currentUser?.id]);
+
   React.useEffect(() => {
-    // Load initial data from SQLite Database
+    // Load initial feed & stories data from SQLite Database
     async function loadDbData() {
-      const [dbPosts, dbStories, dbReels, dbChats] = await Promise.all([
+      const [dbPosts, dbStories, dbReels] = await Promise.all([
         apiClient.getPosts(),
         apiClient.getStories(),
         apiClient.getReels(),
-        apiClient.getChats(),
       ]);
 
       if (dbPosts && dbPosts.length > 0) setPosts(dbPosts);
       if (dbStories && dbStories.length > 0) setStories(dbStories);
       if (dbReels && dbReels.length > 0) setReels(dbReels);
-      if (dbChats && dbChats.length > 0) setChats(dbChats);
     }
     loadDbData();
-  }, []);
+    if (isAuthenticated && currentUser?.id) {
+      refreshSocialData(currentUser.id);
+    }
+  }, [isAuthenticated, currentUser?.id, refreshSocialData]);
 
   React.useEffect(() => {
     (window as any).__aww2wwNavigate = (options: any) => {
@@ -497,6 +550,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Profile updated! ✨');
   };
 
+  const unreadMessagesCount = React.useMemo(() => {
+    return chats.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+  }, [chats]);
+
+  const pendingFriendRequestsCount = friendRequests.length;
+
+  const unreadNotificationsCount = React.useMemo(() => {
+    return notifications.filter(n => !n.isRead).length;
+  }, [notifications]);
+
+  const sendFriendRequest = async (receiverId: string) => {
+    if (!currentUser?.id) return false;
+    const res = await apiClient.sendFriendRequest(currentUser.id, receiverId);
+    if (res && res.success) {
+      setSentFriendRequests(prev => [...prev, receiverId]);
+      showToast('Friend request sent! 📨');
+      return true;
+    }
+    return false;
+  };
+
+  const acceptFriendRequest = async (requestId: string) => {
+    const res = await apiClient.acceptFriendRequest(requestId);
+    if (res && res.success) {
+      setFriendRequests(prev => prev.filter(r => r.id !== requestId));
+      await refreshSocialData();
+      showToast('Friend request accepted! You are now friends 🤝');
+      return true;
+    }
+    return false;
+  };
+
+  const rejectFriendRequest = async (requestId: string) => {
+    const res = await apiClient.rejectFriendRequest(requestId);
+    if (res && res.success) {
+      setFriendRequests(prev => prev.filter(r => r.id !== requestId));
+      showToast('Request removed');
+      return true;
+    }
+    return false;
+  };
+
+  const cancelFriendRequest = async (receiverId: string) => {
+    if (!currentUser?.id) return false;
+    await apiClient.cancelFriendRequest(currentUser.id, receiverId);
+    setSentFriendRequests(prev => prev.filter(id => id !== receiverId));
+    showToast('Request cancelled');
+    return true;
+  };
+
+  const startChatWithUser = async (user: { id: string; name: string; avatar: string; username?: string }) => {
+    if (!currentUser?.id) return;
+    const chatRes = await apiClient.createChat(currentUser.id, user.id);
+    if (chatRes && chatRes.id) {
+      setChats(prev => {
+        const exists = prev.find(c => c.id === chatRes.id);
+        if (exists) return prev;
+        return [chatRes, ...prev];
+      });
+      setActiveChatId(chatRes.id);
+      setActiveTab('messenger');
+      setIsNewChatModalOpen(false);
+    }
+  };
+
+  const markNotificationsRead = async () => {
+    if (!currentUser?.id) return;
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    await apiClient.markNotificationsRead(currentUser.id);
+  };
+
   const login = async (usernameOrEmail?: string, password?: string): Promise<boolean> => {
     if (!usernameOrEmail) {
       localStorage.setItem('aww2ww_user', JSON.stringify(CURRENT_USER));
@@ -504,6 +628,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setProfileUser(CURRENT_USER);
       setIsAuthenticated(true);
       setActiveTab('home');
+      refreshSocialData(CURRENT_USER.id);
       showToast('Logged in successfully! Welcome to aww2ww ✨');
       return true;
     }
@@ -515,6 +640,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('aww2ww_user', JSON.stringify(res.user));
       setIsAuthenticated(true);
       setActiveTab('home');
+      refreshSocialData(res.user.id);
       showToast(`Welcome back, ${res.user.name}! ✨`);
       return true;
     } else {
@@ -531,6 +657,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('aww2ww_user', JSON.stringify(res.user));
       setIsAuthenticated(true);
       setActiveTab('home');
+      setFriends([]);
+      setFriendRequests([]);
+      setSentFriendRequests([]);
+      setChats([]);
+      refreshSocialData(res.user.id);
       showToast(`Account created! Welcome to aww2ww, ${res.user.name} 🎉`);
       return true;
     } else {
@@ -542,6 +673,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const logout = () => {
     localStorage.removeItem('aww2ww_user');
     setIsAuthenticated(false);
+    setFriends([]);
+    setFriendRequests([]);
+    setSentFriendRequests([]);
+    setNotifications([]);
+    setChats([]);
     setActiveTab('auth');
     setAuthScreen('login');
     showToast('Logged out');
@@ -564,6 +700,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setProfileUser,
         isFollowingCreator,
         toggleFollowCreator,
+        friends,
+        friendRequests,
+        sentFriendRequests,
+        notifications,
+        unreadMessagesCount,
+        pendingFriendRequestsCount,
+        unreadNotificationsCount,
+        sendFriendRequest,
+        acceptFriendRequest,
+        rejectFriendRequest,
+        cancelFriendRequest,
+        startChatWithUser,
+        markNotificationsRead,
+        refreshSocialData,
         posts,
         stories,
         chats,

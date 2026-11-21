@@ -106,12 +106,46 @@ export function initDatabase() {
 
     CREATE TABLE IF NOT EXISTS chats (
       id TEXT PRIMARY KEY,
+      user1_id TEXT,
+      user2_id TEXT,
       participant_id TEXT,
       is_group INTEGER DEFAULT 0,
       group_name TEXT,
       members_count TEXT,
       last_message TEXT,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS friends (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      friend_id TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (friend_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS friend_requests (
+      id TEXT PRIMARY KEY,
+      sender_id TEXT NOT NULL,
+      receiver_id TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (sender_id) REFERENCES users(id),
+      FOREIGN KEY (receiver_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      from_user_id TEXT,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      avatar TEXT,
+      is_read INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
     CREATE TABLE IF NOT EXISTS messages (
@@ -138,6 +172,13 @@ export function initDatabase() {
       joined INTEGER DEFAULT 0
     );
   `);
+
+  try {
+    db.prepare('ALTER TABLE chats ADD COLUMN user1_id TEXT').run();
+  } catch {}
+  try {
+    db.prepare('ALTER TABLE chats ADD COLUMN user2_id TEXT').run();
+  } catch {}
 
   console.log('Database initialized successfully at:', dbPath);
 }

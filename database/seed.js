@@ -526,16 +526,16 @@ export function seedDatabase() {
 
   // 7. Chats & Messages
   const insertChat = db.prepare(`
-    INSERT INTO chats (id, participant_id, is_group, group_name, members_count, last_message, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO chats (id, user1_id, user2_id, participant_id, is_group, group_name, members_count, last_message, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const chats = [
-    ['chat_ananya', 'user_ananya', 0, null, null, 'Perfect! See you then 💜', '9:48 AM'],
-    ['chat_mousumi', 'user_mousumi', 0, null, null, 'Sent a photo 📷', '9:32 AM'],
-    ['chat_riya', 'user_riya', 0, null, null, 'Are we still meeting tomorrow?', '9:15 AM'],
-    ['chat_creators_group', null, 1, 'Bengali Creators Hub', '125K members', 'Riya: Uploaded a new reel 🎬', '8:20 AM'],
-    ['chat_travel_group', null, 1, 'Travel Lovers', '98K members', "Mousumi: Let's plan new trip ✈️", 'Yesterday']
+    ['chat_ananya', 'user_tania', 'user_ananya', 'user_ananya', 0, null, null, 'Perfect! See you then 💜', '9:48 AM'],
+    ['chat_mousumi', 'user_tania', 'user_mousumi', 'user_mousumi', 0, null, null, 'Sent a photo 📷', '9:32 AM'],
+    ['chat_riya', 'user_tania', 'user_riya', 'user_riya', 0, null, null, 'Are we still meeting tomorrow?', '9:15 AM'],
+    ['chat_creators_group', null, null, null, 1, 'Bengali Creators Hub', '125K members', 'Riya: Uploaded a new reel 🎬', '8:20 AM'],
+    ['chat_travel_group', null, null, null, 1, 'Travel Lovers', '98K members', "Mousumi: Let's plan new trip ✈️", 'Yesterday']
   ];
 
   for (const c of chats) {

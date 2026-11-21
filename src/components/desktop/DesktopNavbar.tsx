@@ -27,6 +27,10 @@ export const DesktopNavbar: React.FC = () => {
     language, 
     setLanguage, 
     setIsCreatePostOpen,
+    unreadMessagesCount,
+    unreadNotificationsCount,
+    notifications,
+    markNotificationsRead,
     showToast,
     t 
   } = useApp();
@@ -122,28 +126,38 @@ export const DesktopNavbar: React.FC = () => {
           <span className="hidden lg:inline">Create</span>
         </button>
 
-        {/* Messenger with Badge 5 */}
+        {/* Messenger with Dynamic Badge */}
         <button
           onClick={() => setActiveTab('messenger')}
           className="relative w-9 h-9 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 flex items-center justify-center transition-colors active:scale-95"
           title="Messenger"
         >
           <MessageCircle className="w-4.5 h-4.5" />
-          <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white shadow-xs">
-            5
-          </span>
+          {unreadMessagesCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center border-2 border-white shadow-xs">
+              {unreadMessagesCount}
+            </span>
+          )}
         </button>
 
-        {/* Notifications with Badge 12 */}
+        {/* Notifications with Dynamic Badge */}
         <button
-          onClick={() => setShowNotifications(!showNotifications)}
+          onClick={() => {
+            const next = !showNotifications;
+            setShowNotifications(next);
+            if (next && unreadNotificationsCount > 0) {
+              markNotificationsRead();
+            }
+          }}
           className="relative w-9 h-9 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 flex items-center justify-center transition-colors active:scale-95"
           title="Notifications"
         >
           <Bell className="w-4.5 h-4.5" />
-          <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white shadow-xs">
-            12
-          </span>
+          {unreadNotificationsCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center border-2 border-white shadow-xs">
+              {unreadNotificationsCount}
+            </span>
+          )}
         </button>
 
         {/* Confetti button */}
@@ -199,24 +213,32 @@ export const DesktopNavbar: React.FC = () => {
       {showNotifications && (
         <div className="absolute right-12 top-14 w-80 bg-white rounded-2xl shadow-xl border border-purple-100 p-3 z-50 text-left">
           <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-            <span className="font-bold text-xs text-gray-800">Notifications (12)</span>
+            <span className="font-bold text-xs text-gray-800">
+              Notifications {notifications.length > 0 ? `(${notifications.length})` : ''}
+            </span>
             <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
-            <div className="py-2 flex items-start space-x-2 text-xs">
-              <span className="text-pink-500">❤️</span>
-              <p className="text-gray-600"><strong className="text-gray-900">Ananya Saha</strong> loved your photo.</p>
-            </div>
-            <div className="py-2 flex items-start space-x-2 text-xs">
-              <span className="text-purple-500">🎬</span>
-              <p className="text-gray-600"><strong className="text-gray-900">Riya Sen</strong> posted a new reel in <span className="text-purple-600 font-medium">Bengali Creators Hub</span>.</p>
-            </div>
-            <div className="py-2 flex items-start space-x-2 text-xs">
-              <span className="text-blue-500">👥</span>
-              <p className="text-gray-600"><strong className="text-gray-900">Arif Hossain</strong> connected with you.</p>
-            </div>
+            {notifications.length === 0 ? (
+              <div className="py-6 text-center text-xs text-gray-400">
+                No notifications yet ✨
+              </div>
+            ) : (
+              notifications.map((notif, idx) => (
+                <div key={notif.id || idx} className="py-2.5 flex items-start space-x-2 text-xs">
+                  <span className="text-purple-600 shrink-0">
+                    {notif.type === 'friend_request' ? '👥' : notif.type === 'friend_accept' ? '🤝' : '✨'}
+                  </span>
+                  <div className="flex flex-col text-left">
+                    <p className="text-gray-900 font-semibold leading-tight">{notif.title}</p>
+                    <p className="text-gray-500 text-[11px] mt-0.5">{notif.message}</p>
+                    <span className="text-[9px] text-gray-400 mt-0.5">{notif.time || 'Just now'}</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

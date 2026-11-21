@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { Search, Plus, SlidersHorizontal, Image } from 'lucide-react';
+import { Search, Plus, SlidersHorizontal, MessageCircle } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NotesBar } from './NotesBar';
 
 export const MessengerInbox: React.FC = () => {
-  const { chats, openChat, setIsNewChatModalOpen, t } = useApp();
+  const { chats, openChat, setIsNewChatModalOpen, unreadMessagesCount, t } = useApp();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unread' | 'groups' | 'requests'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filterTabs = [
     { id: 'all' as const, label: t.all },
-    { id: 'unread' as const, label: t.unread, badge: 5 },
+    { id: 'unread' as const, label: t.unread, badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
     { id: 'groups' as const, label: t.groups },
-    { id: 'requests' as const, label: t.requests, badge: 3 },
+    { id: 'requests' as const, label: t.requests },
   ];
 
   const filteredChats = chats.filter(c => {
@@ -127,18 +127,32 @@ export const MessengerInbox: React.FC = () => {
 
             <div className="flex flex-col items-end shrink-0 space-y-1">
               <span className="text-[11px] text-gray-400 font-medium">{chat.timestamp}</span>
-              {chat.unreadCount > 0 ? (
+              {chat.unreadCount > 0 && (
                 <span className="w-5 h-5 rounded-full bg-purple-600 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
                   {chat.unreadCount}
                 </span>
-              ) : (
-                chat.id === 'chat_mousumi' && (
-                  <Image className="w-3.5 h-3.5 text-gray-400" />
-                )
               )}
             </div>
           </div>
         ))}
+
+        {filteredChats.length === 0 && (
+          <div className="py-16 px-4 text-center">
+            <div className="w-14 h-14 mx-auto rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+              <MessageCircle className="w-7 h-7" />
+            </div>
+            <h3 className="text-sm font-bold text-gray-800">No messages yet</h3>
+            <p className="text-xs text-gray-500 mt-1 max-w-xs mx-auto">
+              Send private photos, voice notes, and messages to your friends!
+            </p>
+            <button
+              onClick={() => setIsNewChatModalOpen(true)}
+              className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-700 to-pink-600 text-white font-bold text-xs rounded-xl shadow-xs"
+            >
+              Start Chat
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

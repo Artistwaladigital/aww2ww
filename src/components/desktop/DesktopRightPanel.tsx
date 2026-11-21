@@ -3,52 +3,7 @@ import { Play, Flame, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const DesktopRightPanel: React.FC = () => {
-  const { openChat, openFullscreenReel, showToast } = useApp();
-
-  const onlineContacts = [
-    {
-      id: 'chat_ananya',
-      name: 'Ananya Saha',
-      status: 'Active now',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_mousumi',
-      name: 'Mousumi Das',
-      status: 'Active 5m ago',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_riya',
-      name: 'Riya Sen',
-      status: 'Active now',
-      avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_poulami',
-      name: 'Poulami Saha',
-      status: 'Active 12m ago',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_arif',
-      name: 'Arif Hossain',
-      status: 'Active now',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_nusrat',
-      name: 'Nusrat Jahan',
-      status: 'Active 2h ago',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: 'chat_subhashree',
-      name: 'Subhashree Sen',
-      status: 'Active now',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-    },
-  ];
+  const { friends, startChatWithUser, openFullscreenReel, setActiveTab, showToast } = useApp();
 
   const trendingReels = [
     {
@@ -125,41 +80,54 @@ export const DesktopRightPanel: React.FC = () => {
       <div className="bg-white rounded-2xl p-3 border border-purple-50 shadow-2xs">
         <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
           <span className="text-[11px] font-extrabold text-gray-800 uppercase tracking-wider">
-            Contacts & Friends ({onlineContacts.length})
+            Contacts & Friends ({friends.length})
           </span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span className={`w-2 h-2 rounded-full ${friends.length > 0 ? 'bg-emerald-500' : 'bg-gray-300'}`}></span>
         </div>
 
-        <div className="space-y-1">
-          {onlineContacts.map(contact => (
-            <div
-              key={contact.id}
-              onClick={() => openChat(contact.id)}
-              className="flex items-center justify-between p-1.5 rounded-xl hover:bg-purple-50/70 cursor-pointer transition-colors group"
+        {friends.length === 0 ? (
+          <div className="py-4 text-center">
+            <p className="text-xs font-semibold text-gray-700">No friends connected yet</p>
+            <p className="text-[11px] text-gray-400 mt-1">Connect with friends to chat with them here!</p>
+            <button
+              onClick={() => setActiveTab('friends')}
+              className="mt-3 w-full py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition-colors"
             >
-              <div className="flex items-center space-x-2.5">
-                <div className="relative">
-                  <img
-                    src={contact.avatar}
-                    alt={contact.name}
-                    className="w-8 h-8 rounded-full object-cover ring-1 ring-purple-100"
-                  />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
+              Find Friends
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {friends.map(contact => (
+              <div
+                key={contact.id}
+                onClick={() => startChatWithUser(contact)}
+                className="flex items-center justify-between p-1.5 rounded-xl hover:bg-purple-50/70 cursor-pointer transition-colors group"
+              >
+                <div className="flex items-center space-x-2.5">
+                  <div className="relative">
+                    <img
+                      src={contact.avatar}
+                      alt={contact.name}
+                      className="w-8 h-8 rounded-full object-cover ring-1 ring-purple-100"
+                    />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
+                      {contact.name}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{contact.location || 'Online'}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
-                    {contact.name}
-                  </span>
-                  <span className="text-[10px] text-gray-400">{contact.status}</span>
-                </div>
-              </div>
 
-              <span className="text-[10px] text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
-                Chat
-              </span>
-            </div>
-          ))}
-        </div>
+                <span className="text-[10px] text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
+                  Chat
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </aside>
   );

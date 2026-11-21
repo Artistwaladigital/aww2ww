@@ -23,6 +23,7 @@ export const DesktopMessenger: React.FC = () => {
     openChat, 
     setIsNewChatModalOpen, 
     sendMessage, 
+    unreadMessagesCount,
     showToast,
     t 
   } = useApp();
@@ -31,13 +32,13 @@ export const DesktopMessenger: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [inputText, setInputText] = useState('');
 
-  const currentChat = chats.find(c => c.id === activeChatId) || chats[0];
+  const currentChat = chats.find(c => c.id === activeChatId) || (chats.length > 0 ? chats[0] : null);
 
   const filterTabs = [
     { id: 'all' as const, label: t.all },
-    { id: 'unread' as const, label: t.unread, badge: 5 },
+    { id: 'unread' as const, label: t.unread, badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
     { id: 'groups' as const, label: t.groups },
-    { id: 'requests' as const, label: t.requests, badge: 3 },
+    { id: 'requests' as const, label: t.requests },
   ];
 
   const filteredChats = chats.filter(c => {
@@ -177,6 +178,18 @@ export const DesktopMessenger: React.FC = () => {
               </div>
             );
           })}
+
+          {filteredChats.length === 0 && (
+            <div className="p-8 text-center text-xs text-gray-400">
+              <p>No conversations yet.</p>
+              <button
+                onClick={() => setIsNewChatModalOpen(true)}
+                className="mt-3 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-colors"
+              >
+                Start a Chat
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -342,6 +355,12 @@ export const DesktopMessenger: React.FC = () => {
           <p className="text-xs text-gray-500 max-w-xs mt-1">
             Send private photos, voice messages, and texts to friends on aww2ww.
           </p>
+          <button
+            onClick={() => setIsNewChatModalOpen(true)}
+            className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-700 to-pink-600 text-white rounded-xl font-bold text-xs shadow-xs hover:opacity-95 transition-opacity"
+          >
+            Start a Chat
+          </button>
         </div>
       )}
     </div>

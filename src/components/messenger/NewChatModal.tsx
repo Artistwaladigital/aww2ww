@@ -3,13 +3,14 @@ import { X, Search, Check } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const NewChatModal: React.FC = () => {
-  const { isNewChatModalOpen, setIsNewChatModalOpen, openChat, showToast } = useApp();
-  const [selectedIds, setSelectedIds] = useState<string[]>(['user_ananya', 'user_riya', 'grp_travel']);
+  const { isNewChatModalOpen, setIsNewChatModalOpen, startChatWithUser, friends, showToast } = useApp();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!isNewChatModalOpen) return null;
 
   const suggestedUsers = [
+    ...friends,
     {
       id: 'user_ananya',
       name: 'Ananya Saha',
@@ -45,14 +46,7 @@ export const NewChatModal: React.FC = () => {
       isOnline: true,
       avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400&q=80',
     },
-    {
-      id: 'user_arijit',
-      name: 'Arijit Roy',
-      status: 'Offline',
-      isOnline: false,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    },
-  ];
+  ].filter((u, i, arr) => arr.findIndex(item => item.id === u.id) === i);
 
   const suggestedGroups = [
     {
@@ -89,12 +83,13 @@ export const NewChatModal: React.FC = () => {
 
   const handleStartChat = () => {
     setIsNewChatModalOpen(false);
-    if (selectedIds.includes('user_ananya')) {
-      openChat('chat_ananya');
+    const targetUserId = selectedIds[0];
+    const user = suggestedUsers.find(u => u.id === targetUserId);
+    if (user) {
+      startChatWithUser(user);
     } else {
-      openChat('chat_creators_group');
+      showToast('Conversation started 💬');
     }
-    showToast(`Starting conversation with ${selectedIds.length} members 💬`);
   };
 
   return (
@@ -152,13 +147,13 @@ export const NewChatModal: React.FC = () => {
                           alt={u.name}
                           className="w-10 h-10 rounded-full object-cover"
                         />
-                        {u.isOnline && (
+                        {(u as any).isOnline && (
                           <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
                         )}
                       </div>
                       <div className="flex flex-col text-left">
                         <span className="text-xs font-bold text-gray-900">{u.name}</span>
-                        <span className="text-[10px] text-gray-400">{u.status}</span>
+                        <span className="text-[10px] text-gray-400">{(u as any).status || 'Online'}</span>
                       </div>
                     </div>
 
