@@ -88,7 +88,7 @@ export const FacebookLandingPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F0F2F5] flex flex-col justify-between selection:bg-purple-200">
+    <div className="w-full min-h-screen bg-[#F0F2F5] flex flex-col justify-between selection:bg-purple-200 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
       {/* Top Banner Accent */}
       <div className="h-1 bg-gradient-to-r from-purple-700 via-pink-500 to-indigo-600 w-full"></div>
 

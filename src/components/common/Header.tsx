@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
-    <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-purple-100/60 px-4 pt-2 pb-1.5 transition-all">
+    <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-purple-100/60 px-4 pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 transition-all">
       <div className="flex items-center justify-between">
         {/* Logo and Tagline */}
         <div 
