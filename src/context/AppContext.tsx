@@ -12,7 +12,6 @@ import {
   CURRENT_USER,
   MOCK_POSTS,
   MOCK_STORIES,
-  MOCK_CHATS,
   MOCK_REELS,
   MOCK_NOTES,
   MOCK_SONGS,
@@ -158,16 +157,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
   const [stories, setStories] = useState<Story[]>(MOCK_STORIES);
-  const [chats, setChats] = useState<ChatThread[]>(() => {
-    try {
-      const saved = localStorage.getItem('aww2ww_user');
-      if (saved) {
-        const u = JSON.parse(saved);
-        if (u.id !== 'user_tania') return [];
-      }
-    } catch {}
-    return MOCK_CHATS;
-  });
+  const [chats, setChats] = useState<ChatThread[]>([]);
   const [reels, setReels] = useState<Reel[]>(MOCK_REELS);
   const [notes] = useState<Note[]>(MOCK_NOTES);
   const [songs] = useState<Song[]>(MOCK_SONGS);
@@ -640,6 +630,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('aww2ww_user', JSON.stringify(res.user));
       setIsAuthenticated(true);
       setActiveTab('home');
+      setFriends([]);
+      setFriendRequests([]);
+      setSentFriendRequests([]);
+      setNotifications([]);
+      setChats([]);
       refreshSocialData(res.user.id);
       showToast(`Welcome back, ${res.user.name}! ✨`);
       return true;

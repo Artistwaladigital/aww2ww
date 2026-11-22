@@ -2,7 +2,6 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Header } from '../common/Header';
 import { BottomNav } from '../common/BottomNav';
-import { TopTabs } from '../common/TopTabs';
 
 // Feed components
 import { StoriesBar } from '../feed/StoriesBar';
@@ -37,8 +36,7 @@ export const MobileLayout: React.FC = () => {
       {/* Main Tab Content */}
       <main className="flex-1 overflow-y-auto">
         {activeTab === 'home' && (
-          <div className="w-full min-h-screen bg-[#F6F4FB] pb-20">
-            <TopTabs />
+          <div className="w-full min-h-screen bg-[#F6F4FB] pb-24">
             <StoriesBar />
             <CreatePostBox />
             <div className="space-y-1">

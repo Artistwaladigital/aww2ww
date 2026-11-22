@@ -23,7 +23,7 @@ const MainContent: React.FC = () => {
     <>
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-gray-900/95 backdrop-blur-md text-white text-xs font-semibold px-4 py-2 rounded-full shadow-2xl flex items-center space-x-2 animate-bounce border border-purple-500/40">
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-gray-900/95 backdrop-blur-md text-white text-xs font-semibold px-4 py-2 rounded-full shadow-2xl flex items-center space-x-2 animate-bounce border border-purple-500/40">
           <span>✨</span>
           <span>{toastMessage}</span>
         </div>
