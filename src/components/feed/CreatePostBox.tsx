@@ -19,7 +19,7 @@ export const CreatePostBox: React.FC = () => {
         />
         <div className="flex-1 bg-purple-50/50 hover:bg-purple-50/80 rounded-full px-4 py-2 transition-colors flex items-center justify-between">
           <span className="text-xs text-gray-500 font-normal">
-            {t.whatsOnYourMind}
+            {currentUser?.name ? `What's on your mind, ${currentUser.name.split(' ')[0]}?` : t.whatsOnYourMind}
           </span>
           <span className="text-purple-400">✨</span>
         </div>

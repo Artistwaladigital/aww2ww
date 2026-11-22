@@ -1,7 +1,6 @@
 import React from 'react';
 import { Store, Tag, Search, Heart } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { TopTabs } from '../common/TopTabs';
 
 export const MarketplaceView: React.FC = () => {
   const { showToast } = useApp();
@@ -41,8 +40,6 @@ export const MarketplaceView: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-20 select-none">
-      <TopTabs />
-
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-purple-50 flex items-center justify-between">
         <div className="flex items-center space-x-2">

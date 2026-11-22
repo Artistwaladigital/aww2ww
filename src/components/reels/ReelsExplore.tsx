@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Sparkles, Video, Crown } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { TopTabs } from '../common/TopTabs';
 
 export const ReelsExplore: React.FC = () => {
   const { reels, openFullscreenReel, setIsCreateReelOpen, t } = useApp();
@@ -33,9 +32,6 @@ export const ReelsExplore: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-20 select-none">
-      {/* Top Tabs */}
-      <TopTabs />
-
       {/* Header and filters matching Screenshot 5 */}
       <div className="p-3.5 bg-white border-b border-purple-50">
         <div className="flex items-center justify-between mb-2.5">

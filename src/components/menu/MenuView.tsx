@@ -13,7 +13,6 @@ import {
   FileText
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { TopTabs } from '../common/TopTabs';
 import { CURRENT_USER, ANANYA_SAHA } from '../../data/mockData';
 
 export const MenuView: React.FC = () => {
@@ -32,8 +31,6 @@ export const MenuView: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-24 select-none">
-      <TopTabs />
-
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-purple-50 text-left">
         <h1 className="text-xl font-black text-gray-900 tracking-tight">Menu & Controls</h1>

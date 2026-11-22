@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Users, Plus, MessageCircle } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { TopTabs } from '../common/TopTabs';
 
 export const GroupsView: React.FC = () => {
   const { openChat, showToast } = useApp();
@@ -59,8 +58,6 @@ export const GroupsView: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-20 select-none">
-      <TopTabs />
-
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-purple-50 flex items-center justify-between">
         <div className="flex items-center space-x-2">
